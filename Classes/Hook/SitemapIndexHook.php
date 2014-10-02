@@ -536,6 +536,11 @@ class SitemapIndexHook implements \TYPO3\CMS\Core\SingletonInterface {
 			return FALSE;
 		}
 
+        // Check if page is excluded from search engines
+        if (!empty($GLOBALS['TSFE']->page['tx_metaseo_is_exclude'])) {
+            return FALSE;
+        }
+
 		// ############################
 		// Cache checks
 		// ############################
