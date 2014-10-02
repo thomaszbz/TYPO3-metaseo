@@ -247,6 +247,11 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
             // Generate MetaTags
             // #####################################
 
+            // Dublin core schema
+            if ($enableMetaDc) {
+                $ret['meta.dc'] = '<link rel="schema.DC" href="http://purl.org/dc/terms/">';
+            }
+
             // title
             if (!empty($tsSetupSeo['title']) && $enableMetaDc) {
                 $ret['meta.title'] = '<meta name="DC.title" content="' . htmlspecialchars($tsSetupSeo['title']) . '">';
