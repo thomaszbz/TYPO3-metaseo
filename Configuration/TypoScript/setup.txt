@@ -133,6 +133,16 @@ plugin.metaseo {
 			}
 		}
 
+        # openGraph configuration
+        openGraph = 1
+        openGraph {
+            type = TEXT
+            type.value = website
+
+            title = TEXT
+            title.field = title
+        }
+
 		# section links (start, up, next, prev)
 		sectionLinks =
 		sectionLinks {
