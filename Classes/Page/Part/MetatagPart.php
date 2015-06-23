@@ -303,6 +303,15 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Check if XML is configured
+     *
+     * @return bool
+     */
+    protected function isXml() {
+        return ($GLOBALS['TSFE']->xhtmlVersion == TRUE);
+    }
+
+    /**
      * Generate a link via TYPO3-Api
      *
      * @param    integer|string $url       URL (id or string)
@@ -581,6 +590,7 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
         $ret = array();
 
         $isHtml5 = $this->isHtml5();
+        $isXml = $this->isXml();
 
         foreach ($metaTags as $metaTag) {
             $tag        = $metaTag['tag'];
@@ -591,7 +601,7 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
                 $attributes[] = $key . '="' . htmlspecialchars($value) . '"';
             }
 
-            if ($isHtml5) {
+            if ($isHtml5 && !$isXml) {
                 $ret[] = '<' . $tag . ' ' . implode(' ', $attributes) . '>';
             } else {
                 $ret[] = '<' . $tag . ' ' . implode(' ', $attributes) . '/>';
