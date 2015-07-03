@@ -33,14 +33,16 @@ use Metaseo\Metaseo\Utility\RootPageUtility;
 /**
  * TYPO3 Command controller
  */
-class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\CommandController {
+class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\CommandController
+{
 
     /**
      * Get whole list of sitemap entries
      *
      * @return  string
      */
-    public function garbageCollectorCommand() {
+    public function garbageCollectorCommand()
+    {
         // Expire sitemap entries
         \Metaseo\Metaseo\Utility\SitemapUtility::expire();
     }
@@ -52,7 +54,8 @@ class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\Command
      *
      * @return  string
      */
-    public function clearSitemapCommand($rootPageId) {
+    public function clearSitemapCommand($rootPageId)
+    {
         $rootPageId = $this->getRootPageIdFromId($rootPageId);
 
         if ($rootPageId !== null) {
@@ -69,51 +72,19 @@ class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\Command
     }
 
     /**
-     * Get whole list of sitemap entries
-     *
-     * @param   string $rootPageId Site root page id or domain
-     *
-     * @return  string
-     */
-    public function sitemapCommand($rootPageId) {
-        $rootPageId = $this->getRootPageIdFromId($rootPageId);
-
-        if ($rootPageId !== null) {
-            $domain = RootPageUtility::getDomain($rootPageId);
-
-            $query   = 'SELECT page_url
-                          FROM tx_metaseo_sitemap
-                         WHERE page_rootpid = ' . DatabaseUtility::quote($rootPageId, 'tx_metaseo_sitemap') . '
-                           AND is_blacklisted = 0';
-            $urlList = DatabaseUtility::getCol($query);
-
-            foreach ($urlList as $url) {
-                if ($domain) {
-                    $url = \Metaseo\Metaseo\Utility\GeneralUtility::fullUrl($url, $domain);
-                }
-
-                ConsoleUtility::writeLine($url);
-            }
-        } else {
-            ConsoleUtility::writeErrorLine('No such root page found');
-            ConsoleUtility::teminate(1);
-        }
-    }
-
-
-    /**
      * Detect root page from id (either PID or sys_domain)
      *
      * @param  $var
      *
      * @return int|mixed|null
      */
-    protected function getRootPageIdFromId($var) {
+    protected function getRootPageIdFromId($var)
+    {
         $ret = null;
 
         if (is_numeric($var)) {
             // Passed variable is numeric
-            $pageId = (int)$var;
+            $pageId = (int) $var;
 
             /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
             $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
@@ -134,7 +105,7 @@ class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\Command
                         FROM sys_domain
                        WHERE domainName = ' . DatabaseUtility::quote($var, 'sys_domain') . '
                          AND hidden = 0';
-            $pid   = DatabaseUtility::getOne($query);
+            $pid = DatabaseUtility::getOne($query);
 
             if (!empty($pid)) {
                 $ret = $pid;
@@ -142,5 +113,38 @@ class MetaseoCommandController extends \TYPO3\CMS\Extbase\Mvc\Controller\Command
         }
 
         return $ret;
+    }
+
+    /**
+     * Get whole list of sitemap entries
+     *
+     * @param   string $rootPageId Site root page id or domain
+     *
+     * @return  string
+     */
+    public function sitemapCommand($rootPageId)
+    {
+        $rootPageId = $this->getRootPageIdFromId($rootPageId);
+
+        if ($rootPageId !== null) {
+            $domain = RootPageUtility::getDomain($rootPageId);
+
+            $query = 'SELECT page_url
+                          FROM tx_metaseo_sitemap
+                         WHERE page_rootpid = ' . DatabaseUtility::quote($rootPageId, 'tx_metaseo_sitemap') . '
+                           AND is_blacklisted = 0';
+            $urlList = DatabaseUtility::getCol($query);
+
+            foreach ($urlList as $url) {
+                if ($domain) {
+                    $url = \Metaseo\Metaseo\Utility\GeneralUtility::fullUrl($url, $domain);
+                }
+
+                ConsoleUtility::writeLine($url);
+            }
+        } else {
+            ConsoleUtility::writeErrorLine('No such root page found');
+            ConsoleUtility::teminate(1);
+        }
     }
 }

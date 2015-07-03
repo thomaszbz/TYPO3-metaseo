@@ -31,7 +31,8 @@ use Metaseo\Metaseo\Utility\DatabaseUtility;
 /**
  * TYPO3 Backend module root settings
  */
-class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\AbstractStandardModule {
+class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\AbstractStandardModule
+{
     // ########################################################################
     // Attributes
     // ########################################################################
@@ -43,13 +44,14 @@ class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\Abst
     /**
      * Main action
      */
-    public function mainAction() {
+    public function mainAction()
+    {
         // #################
         // Root page list
         // #################
 
         $rootPageList = \Metaseo\Metaseo\Utility\BackendUtility::getRootPageList();
-        $rootIdList   = array_keys($rootPageList);
+        $rootIdList = array_keys($rootPageList);
 
         $rootPidCondition = null;
         if (!empty($rootIdList)) {
@@ -63,7 +65,7 @@ class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\Abst
         // #################
 
         // check which root lages have no root settings
-        $query   = 'SELECT p.uid
+        $query = 'SELECT p.uid
                       FROM pages p
                            LEFT JOIN tx_metaseo_setting_root seosr
                                 ON seosr.pid = p.uid
@@ -73,10 +75,10 @@ class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\Abst
         $uidList = DatabaseUtility::getCol($query);
         foreach ($uidList as $tmpUid) {
             $query = 'INSERT INTO tx_metaseo_setting_root (pid, tstamp, crdate, cruser_id)
-                           VALUES (' . (int)$tmpUid . ',
-                                   ' . (int)time() . ',
-                                   ' . (int)time() . ',
-                                   ' . (int)$GLOBALS['BE_USER']->user['uid'] . ')';
+                           VALUES (' . (int) $tmpUid . ',
+                                   ' . (int) time() . ',
+                                   ' . (int) time() . ',
+                                   ' . (int) $GLOBALS['BE_USER']->user['uid'] . ')';
             DatabaseUtility::execInsert($query);
         }
 
@@ -87,7 +89,7 @@ class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\Abst
         // ##################
 
         // Fetch domain name
-        $query   = 'SELECT uid,
+        $query = 'SELECT uid,
                            pid,
                            domainName,
                            forced
@@ -128,11 +130,8 @@ class BackendRootSettingsController extends \Metaseo\Metaseo\Backend\Module\Abst
 
         // check if there is any root page
         if (empty($rootPageList)) {
-            $this->addFlashMessage(
-                $this->translate('message.warning.noRootPage.message'),
-                $this->translate('message.warning.noRootPage.title'),
-                \TYPO3\CMS\Core\Messaging\FlashMessage::WARNING
-            );
+            $this->addFlashMessage($this->translate('message.warning.noRootPage.message'),
+                $this->translate('message.warning.noRootPage.title'), \TYPO3\CMS\Core\Messaging\FlashMessage::WARNING);
         }
 
         $this->view->assign('RootPageList', $rootPageList);

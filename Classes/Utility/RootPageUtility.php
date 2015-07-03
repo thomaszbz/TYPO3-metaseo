@@ -29,7 +29,8 @@ namespace Metaseo\Metaseo\Utility;
 /**
  * Root page utility
  */
-class RootPageUtility {
+class RootPageUtility
+{
 
     /**
      * Domain cache
@@ -49,7 +50,8 @@ class RootPageUtility {
      *
      * @return string
      */
-    public static function getSitemapIndexUrl($rootPid) {
+    public static function getSitemapIndexUrl($rootPid)
+    {
         return self::getFrontendUrl($rootPid, SitemapUtility::PAGE_TYPE_SITEMAP_XML);
     }
 
@@ -61,7 +63,8 @@ class RootPageUtility {
      *
      * @return string
      */
-    public static function getFrontendUrl($rootPid, $typeNum) {
+    public static function getFrontendUrl($rootPid, $typeNum)
+    {
         $domain = self::getDomain($rootPid);
         if (!empty($domain)) {
             $domain = 'http://' . $domain . '/';
@@ -69,7 +72,7 @@ class RootPageUtility {
             $domain = \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
         }
         // "build", TODO: use typolink to use TYPO3 internals
-        $url = $domain . 'index.php?id=' . (int)$rootPid . '&type=' . (int)$typeNum;
+        $url = $domain . 'index.php?id=' . (int) $rootPid . '&type=' . (int) $typeNum;
 
         return $url;
     }
@@ -81,7 +84,8 @@ class RootPageUtility {
      *
      * @return  null|string
      */
-    public static function getDomain($rootPid) {
+    public static function getDomain($rootPid)
+    {
         // Use cached one if exists
         if (isset(self::$domainCache[$rootPid])) {
             return self::$domainCache[$rootPid];
@@ -90,12 +94,12 @@ class RootPageUtility {
         // Fetch domain name
         $query = 'SELECT domainName
                     FROM sys_domain
-                   WHERE pid = ' . (int)$rootPid . '
+                   WHERE pid = ' . (int) $rootPid . '
                      AND hidden = 0
                 ORDER BY forced DESC,
                          sorting
                    LIMIT 1';
-        $ret   = DatabaseUtility::getOne($query);
+        $ret = DatabaseUtility::getOne($query);
 
         // Remove possible slash at the end
         $ret = rtrim($ret, '/');
@@ -113,7 +117,8 @@ class RootPageUtility {
      *
      * @return string
      */
-    public static function getRobotsTxtUrl($rootPid) {
+    public static function getRobotsTxtUrl($rootPid)
+    {
         return self::getFrontendUrl($rootPid, SitemapUtility::PAGE_TYPE_ROBOTS_TXT);
     }
 }

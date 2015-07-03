@@ -31,14 +31,8 @@ use Metaseo\Metaseo\Utility\DatabaseUtility;
 /**
  * Metatags generator
  */
-class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
-
-    /**
-     * List of stdWrap manipulations
-     *
-     * @var array
-     */
-    protected $stdWrapList = array();
+class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart
+{
 
     /**
      * Content object renderer
@@ -46,7 +40,12 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
      * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
      */
     public $cObj;
-
+    /**
+     * List of stdWrap manipulations
+     *
+     * @var array
+     */
+    protected $stdWrapList = array();
     /**
      * TypoScript Setup
      *
@@ -70,7 +69,7 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
 
     /**
      * Page record
-     * 
+     *
      * @var array
      */
     protected $pageRecord = array();
@@ -90,38 +89,12 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     protected $metaTagList = array();
 
     /**
-     * Initialize
-     */
-    protected function initialize() {
-        $this->cObj       = $GLOBALS['TSFE']->cObj;
-        $this->tsSetup    = $GLOBALS['TSFE']->tmpl->setup;
-        $this->pageRecord = $GLOBALS['TSFE']->page;
-        $this->pageMeta   = array();
-
-        $this->metaTagList = array();
-
-        if (!empty($this->tsSetup['plugin.']['metaseo.']['metaTags.'])) {
-            $this->tsSetupSeo = $this->tsSetup['plugin.']['metaseo.']['metaTags.'];
-
-            // get stdwrap list
-            if (!empty($this->tsSetupSeo['stdWrap.'])) {
-                $this->stdWrapList = $this->tsSetupSeo['stdWrap.'];
-            }
-
-            if (empty($this->tsSetupSeo['enableDC'])) {
-                $this->enableMetaDc = false;
-            }
-        } else {
-            $this->tsSetupSeo = false;
-        }
-    }
-
-    /**
      * Add MetaTags
      *
      * @return    string            XHTML Code with metatags
      */
-    public function main() {
+    public function main()
+    {
         // INIT
         $this->metaTagList = array();
 
@@ -171,7 +144,8 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
             }
 
             // Call hook
-            \Metaseo\Metaseo\Utility\GeneralUtility::callHookAndSignal(__CLASS__, 'metatagSetup', $this, $this->tsSetupSeo);
+            \Metaseo\Metaseo\Utility\GeneralUtility::callHookAndSignal(__CLASS__, 'metatagSetup', $this,
+                $this->tsSetupSeo);
 
             // standard metatags
             $this->generateStandardMetaTags();
@@ -229,9 +203,38 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Initialize
+     */
+    protected function initialize()
+    {
+        $this->cObj = $GLOBALS['TSFE']->cObj;
+        $this->tsSetup = $GLOBALS['TSFE']->tmpl->setup;
+        $this->pageRecord = $GLOBALS['TSFE']->page;
+        $this->pageMeta = array();
+
+        $this->metaTagList = array();
+
+        if (!empty($this->tsSetup['plugin.']['metaseo.']['metaTags.'])) {
+            $this->tsSetupSeo = $this->tsSetup['plugin.']['metaseo.']['metaTags.'];
+
+            // get stdwrap list
+            if (!empty($this->tsSetupSeo['stdWrap.'])) {
+                $this->stdWrapList = $this->tsSetupSeo['stdWrap.'];
+            }
+
+            if (empty($this->tsSetupSeo['enableDC'])) {
+                $this->enableMetaDc = false;
+            }
+        } else {
+            $this->tsSetupSeo = false;
+        }
+    }
+
+    /**
      * Init extension support
      */
-    protected function initExtensionSupport() {
+    protected function initExtensionSupport()
+    {
 
         // Extension: news
         if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('news')) {
@@ -242,7 +245,8 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     /**
      * Init extension support for "news" extension
      */
-    protected function initExtensionSupportNews() {
+    protected function initExtensionSupportNews()
+    {
         if (empty($GLOBALS['TSFE']->register)) {
             return;
         }
@@ -276,6 +280,143 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Collect meta data (eg. from page via stdwrap)
+     */
+    protected function collectMetaDataFromPage()
+    {
+        // #################
+        // Page meta
+        // #################
+
+        // description
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['description_page'],
+            $this->tsSetupSeo['conf.']['description_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['description'] = $tmp;
+        }
+
+        // keywords
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['keywords_page'],
+            $this->tsSetupSeo['conf.']['keywords_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['keywords'] = $tmp;
+        }
+
+        // title
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['title_page'],
+            $this->tsSetupSeo['conf.']['title_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['title'] = $tmp;
+        }
+
+        // author
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['author_page'],
+            $this->tsSetupSeo['conf.']['author_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['author'] = $tmp;
+        }
+
+        // email
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['email_page'],
+            $this->tsSetupSeo['conf.']['email_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['email'] = $tmp;
+        }
+
+        // last-update
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['lastUpdate_page'],
+            $this->tsSetupSeo['conf.']['lastUpdate_page.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['lastUpdate'] = $tmp;
+        }
+
+        // #################
+        // Geo
+        // #################
+
+        // tx_metaseo_geo_lat
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_lat'],
+            $this->tsSetupSeo['conf.']['tx_metaseo_geo_lat.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['geoPositionLatitude'] = $tmp;
+        }
+
+        // tx_metaseo_geo_long
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_long'],
+            $this->tsSetupSeo['conf.']['tx_metaseo_geo_long.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['geoPositionLongitude'] = $tmp;
+        }
+
+        // tx_metaseo_geo_place
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_place'],
+            $this->tsSetupSeo['conf.']['tx_metaseo_geo_place.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['geoPlacename'] = $tmp;
+        }
+
+        // tx_metaseo_geo_region
+        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_region'],
+            $this->tsSetupSeo['conf.']['tx_metaseo_geo_region.']);
+        if (!empty($tmp)) {
+            $this->pageMeta['geoRegion'] = $tmp;
+        }
+
+        // #################
+        // Process meta tags
+        // #################
+
+        // process page meta data
+        foreach ($this->pageMeta as $metaKey => $metaValue) {
+            $metaValue = trim($metaValue);
+
+            if (!empty($metaValue)) {
+                $this->tsSetupSeo[$metaKey] = $metaValue;
+            }
+        }
+    }
+
+    /**
+     * Collect metadata from connector
+     *
+     * @return mixed
+     */
+    protected function collectMetaDataFromConnector()
+    {
+        $ret = array();
+
+        /** @var \Metaseo\Metaseo\Connector $connector */
+        $connector = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
+        $storeMeta = $connector->getStore();
+
+        // Std meta tags
+        foreach ($storeMeta['meta'] as $metaKey => $metaValue) {
+            $metaValue = trim($metaValue);
+
+            if ($metaValue === null) {
+                // Remove meta
+                unset($this->tsSetupSeo[$metaKey]);
+            } elseif (!empty($metaValue)) {
+                $this->tsSetupSeo[$metaKey] = $metaValue;
+            }
+        }
+
+        // Custom meta tags
+        foreach ($storeMeta['custom'] as $metaKey => $metaValue) {
+            $metaValue = trim($metaValue);
+
+            if ($metaValue === null) {
+                // Remove meta
+                unset($ret[$metaKey]);
+            } elseif (!empty($metaValue)) {
+                $ret[$metaKey] = $metaValue;
+            }
+        }
+
+        return $ret;
+    }
+
+    /**
      * Process stdWrap from stdWrap list
      *
      * @param    string $key   StdWrap-List key
@@ -283,7 +424,8 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
      *
      * @return   string
      */
-    protected function applyStdWrap($key, $value) {
+    protected function applyStdWrap($key, $value)
+    {
         $key .= '.';
 
         if (empty($this->stdWrapList[$key])) {
@@ -294,46 +436,494 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Generate standard metatags
+     */
+    protected function generateStandardMetaTags()
+    {
+        // dc schema
+        if ($this->enableMetaDc && !$this->isHtml5()) {
+            //schema.DCTERMS not allowed in HTML5 according to W3C validator #18
+            $this->metaTagList['meta.schema.dc'] = array(
+                'tag' => 'link',
+                'attributes' => array(
+                    'rel' => 'schema.DCTERMS',
+                    'href' => 'http://purl.org/dc/terms/',
+                ),
+            );
+        }
+
+        // title
+        if (!empty($this->tsSetupSeo['title']) && $this->enableMetaDc) {
+            $this->metaTagList['meta.title'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'DCTERMS.title',
+                    'content' => $this->tsSetupSeo['title'],
+                ),
+            );
+        }
+
+        // description
+        if (!empty($this->tsSetupSeo['description'])) {
+            $this->metaTagList['meta.description'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'description',
+                    'content' => $this->tsSetupSeo['description'],
+                ),
+            );
+
+            if ($this->enableMetaDc) {
+                $this->metaTagList['meta.description.dc'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'name' => 'DCTERMS.description',
+                        'content' => $this->tsSetupSeo['description'],
+                    ),
+                );
+            }
+        }
+
+        // keywords
+        if (!empty($this->tsSetupSeo['keywords'])) {
+            $this->metaTagList['meta.keywords'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'keywords',
+                    'content' => $this->tsSetupSeo['keywords'],
+                ),
+            );
+
+            if ($this->enableMetaDc) {
+                $this->metaTagList['meta.keywords.dc'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'name' => 'DCTERMS.subject',
+                        'content' => $this->tsSetupSeo['keywords'],
+                    ),
+                );
+            }
+        }
+
+        // copyright
+        if (!empty($this->tsSetupSeo['copyright'])) {
+            $this->metaTagList['meta.copyright'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'copyright',
+                    'content' => $this->tsSetupSeo['copyright'],
+                ),
+            );
+
+            if ($this->enableMetaDc) {
+                $this->metaTagList['meta.copyright.dc'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'name' => 'DCTERMS.rights',
+                        'content' => $this->tsSetupSeo['copyright'],
+                    ),
+                );
+            }
+        }
+
+        // email
+        if (!empty($this->tsSetupSeo['email'])) {
+            $this->metaTagList['meta.email.link'] = array(
+                'tag' => 'link',
+                'attributes' => array(
+                    'rev' => 'made',
+                    'href' => 'mailto:' . $this->tsSetupSeo['email'],
+                ),
+            );
+
+            $this->metaTagList['meta.email.http'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'http-equiv' => 'reply-to',
+                    'content' => $this->tsSetupSeo['email'],
+                ),
+            );
+        }
+
+        // author
+        if (!empty($this->tsSetupSeo['author'])) {
+            $this->metaTagList['meta.author'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'author',
+                    'content' => $this->tsSetupSeo['author'],
+                ),
+            );
+
+            if ($this->enableMetaDc) {
+                $this->metaTagList['meta.author.dc'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'name' => 'DCTERMS.creator',
+                        'content' => $this->tsSetupSeo['author'],
+                    ),
+                );
+            }
+        }
+
+        // author
+        if (!empty($this->tsSetupSeo['publisher']) && $this->enableMetaDc) {
+            $this->metaTagList['meta.publisher.dc'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'DCTERMS.publisher',
+                    'content' => $this->tsSetupSeo['publisher'],
+                ),
+            );
+        }
+
+        // distribution
+        if (!empty($this->tsSetupSeo['distribution'])) {
+            $this->metaTagList['meta.distribution'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'distribution',
+                    'content' => $this->tsSetupSeo['distribution'],
+                ),
+            );
+        }
+
+        // rating
+        if (!empty($this->tsSetupSeo['rating'])) {
+            $this->metaTagList['meta.rating'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'rating',
+                    'content' => $this->tsSetupSeo['rating'],
+                ),
+            );
+        }
+
+        // last-update
+        if (!empty($this->tsSetupSeo['useLastUpdate']) && !empty($this->tsSetupSeo['lastUpdate'])) {
+            $this->metaTagList['meta.date'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'date',
+                    'content' => $this->tsSetupSeo['lastUpdate'],
+                ),
+            );
+
+            if ($this->enableMetaDc) {
+                $this->metaTagList['meta.date.dc'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'name' => 'DCTERMS.date',
+                        'content' => $this->tsSetupSeo['lastUpdate'],
+                    ),
+                );
+            }
+        }
+
+        // expire
+        if (!empty($this->tsSetupSeo['useExpire']) && !empty($this->pageRecord['endtime'])) {
+            $this->metaTagList['meta.expire'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'googlebot',
+                    'content' => 'unavailable_after: ' . date('d-M-Y H:i:s T', $this->pageRecord['endtime']),
+                ),
+            );
+        }
+    }
+
+    /**
      * Check if page is configured as HTML5
      *
      * @return bool
      */
-    protected function isHtml5() {
+    protected function isHtml5()
+    {
         return ($GLOBALS['TSFE']->config['config']['doctype'] === 'html5');
     }
 
     /**
-     * Check if page is configured as XHTML
-     *
-     * @return bool
+     * Genrate crawler (eg. robots) MetaTags
      */
-    protected function isXhtml() {
-        $ret = false;
+    protected function generateCrawlerMetaTags()
+    {
+        // robots
+        if (!empty($this->tsSetupSeo['robotsEnable'])) {
+            $crawlerOrder = array();
 
-        if (strpos($GLOBALS['TSFE']->config['config']['doctype'], 'xhtml') !== FALSE) {
-            // doctype xhtml
-            $ret = true;
+            if (!empty($this->tsSetupSeo['robotsIndex']) && empty($this->pageRecord['tx_metaseo_is_exclude'])) {
+                $crawlerOrder['index'] = 'index';
+            } else {
+                $crawlerOrder['index'] = 'noindex';
+            }
+
+            if (!empty($this->tsSetupSeo['robotsFollow'])) {
+                $crawlerOrder['follow'] = 'follow';
+            } else {
+                $crawlerOrder['follow'] = 'nofollow';
+            }
+
+            if (empty($this->tsSetupSeo['robotsArchive'])) {
+                $crawlerOrder['archive'] = 'noarchive';
+            }
+
+            if (empty($this->tsSetupSeo['robotsSnippet'])) {
+                $crawlerOrder['snippet'] = 'nosnippet';
+            }
+
+            if (!empty($this->tsSetupSeo['robotsNoImageindex']) && $this->tsSetupSeo['robotsNoImageindex'] === '1') {
+                $crawlerOrder['noimageindex'] = 'noimageindex';
+            }
+
+            if (!empty($this->tsSetupSeo['robotsNoTranslate']) && $this->tsSetupSeo['robotsNoTranslate'] === '1') {
+                $crawlerOrder['notranslate'] = 'notranslate';
+            }
+
+            if (empty($this->tsSetupSeo['robotsOdp'])) {
+                $crawlerOrder['odp'] = 'noodp';
+            }
+
+            if (empty($this->tsSetupSeo['robotsYdir'])) {
+                $crawlerOrder['ydir'] = 'noydir';
+            }
+
+
+            $this->metaTagList['crawler.robots'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'robots',
+                    'content' => implode(',', $crawlerOrder),
+                ),
+            );
         }
 
-        if (strpos($GLOBALS['TSFE']->config['config']['xhtmlDoctype'], 'xhtml') !== FALSE) {
-            // doctype xhtml doctype
-            $ret = true;
+        // revisit
+        if (!empty($this->tsSetupSeo['revisit'])) {
+            $this->metaTagList['crawler.revisit'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'revisit-after',
+                    'content' => $this->tsSetupSeo['revisit'],
+                ),
+            );
         }
-
-        return $ret;
     }
 
+    /**
+     * Generate geo position MetaTags
+     */
+    protected function generateGeoPosMetaTags()
+    {
+        // Geo-Position
+        if (!empty($this->tsSetupSeo['geoPositionLatitude']) && !empty($this->tsSetupSeo['geoPositionLongitude'])) {
+            $this->metaTagList['geo.icmb'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'ICBM',
+                    'content' => $this->tsSetupSeo['geoPositionLatitude'] . ', ' . $this->tsSetupSeo['geoPositionLongitude'],
+                ),
+            );
+            $this->metaTagList['geo.position'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'geo.position',
+                    'content' => $this->tsSetupSeo['geoPositionLatitude'] . ';' . $this->tsSetupSeo['geoPositionLongitude'],
+                ),
+            );
+        }
+
+        // Geo-Region
+        if (!empty($this->tsSetupSeo['geoRegion'])) {
+            $this->metaTagList['geo.region'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'geo.region',
+                    'content' => $this->tsSetupSeo['geoRegion'],
+                ),
+            );
+        }
+
+        // Geo Placename
+        if (!empty($this->tsSetupSeo['geoPlacename'])) {
+            $this->metaTagList['geo.placename'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'geo.placename',
+                    'content' => $this->tsSetupSeo['geoPlacename'],
+                ),
+            );
+        }
+    }
+
+    /**
+     * Generate service (eg. google) MetaTags
+     */
+    protected function generateServicesMetaTags()
+    {
+        // Google Verification
+        if (!empty($this->tsSetupSeo['googleVerification'])) {
+            $this->metaTagList['service.verification.google'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'google-site-verification',
+                    'content' => $this->tsSetupSeo['googleVerification'],
+                ),
+            );
+        }
+
+        // MSN Verification
+        if (!empty($this->tsSetupSeo['msnVerification'])) {
+            $this->metaTagList['service.verification.msn'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'msvalidate.01',
+                    'content' => $this->tsSetupSeo['msnVerification'],
+                ),
+            );
+        }
+
+        // Yahoo Verification
+        if (!empty($this->tsSetupSeo['yahooVerification'])) {
+            $this->metaTagList['service.verification.yahoo'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'y_key',
+                    'content' => $this->tsSetupSeo['yahooVerification'],
+                ),
+            );
+        }
+
+        // WebOfTrust Verification
+        if (!empty($this->tsSetupSeo['wotVerification'])) {
+            $this->metaTagList['service.verification.wot'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'name' => 'wot-verification',
+                    'content' => $this->tsSetupSeo['wotVerification'],
+                ),
+            );
+        }
+
+
+        // PICS label
+        if (!empty($this->tsSetupSeo['picsLabel'])) {
+            $this->metaTagList['service.pics'] = array(
+                'tag' => 'meta',
+                'attributes' => array(
+                    'http-equiv' => 'PICS-Label',
+                    'content' => $this->tsSetupSeo['picsLabel'],
+                ),
+            );
+        }
+    }
+
+    /**
+     * Generate user agent metatags
+     */
+    protected function generateUserAgentMetaTags()
+    {
+        if (!empty($this->tsSetupSeo['ieCompatibilityMode'])) {
+            if (is_numeric($this->tsSetupSeo['ieCompatibilityMode'])) {
+                $this->metaTagList['ua.msie.compat'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'http-equiv' => 'X-UA-Compatible',
+                        'content' => 'IE=EmulateIE' . (int) $this->tsSetupSeo['ieCompatibilityMode'],
+                    ),
+                );
+            } else {
+                $this->metaTagList['ua.msie.compat'] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'http-equiv' => 'X-UA-Compatible',
+                        'content' => $this->tsSetupSeo['ieCompatibilityMode'],
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
+     * Generate Link (next, prev..) MetaTags
+     */
+    protected function generateLinkMetaTags()
+    {
+        $rootLine = \Metaseo\Metaseo\Utility\GeneralUtility::getRootLine();
+
+        $currentPage = end($rootLine);
+        $rootPage = reset($rootLine);
+
+        $currentIsRootpage = ($currentPage['uid'] === $rootPage['uid']);
+
+        // Generate rootpage url
+        $rootPageUrl = null;
+        if (!empty($rootPage)) {
+            $rootPageUrl = $this->generateLink($rootPage['uid']);
+        }
+
+        // Only generate up, prev and next if NOT rootpage
+        // to prevent linking to other domains
+        // see https://github.com/mblaschke/TYPO3-metaseo/issues/5
+        if (!$currentIsRootpage) {
+
+            $prevPage = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['prev.']);
+            $prevPageUrl = null;
+            if (!empty($prevPage)) {
+                $prevPageUrl = $this->generateLink($prevPage);
+            }
+
+            $nextPage = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['next.']);
+            $nextPageUrl = null;
+            if (!empty($nextPage)) {
+                $nextPageUrl = $this->generateLink($nextPage);
+            }
+        }
+
+        // Root (First page in rootline)
+        if (!empty($rootPageUrl)) {
+            $this->metaTagList['link.rel.start'] = array(
+                'tag' => 'link',
+                'attributes' => array(
+                    'rel' => 'start',
+                    'href' => $rootPageUrl,
+                ),
+            );
+        }
+
+        // Next (Next page in rootline)
+        if (!empty($nextPageUrl)) {
+            $this->metaTagList['link.rel.next'] = array(
+                'tag' => 'link',
+                'attributes' => array(
+                    'rel' => 'next',
+                    'href' => $nextPageUrl,
+                ),
+            );
+        }
+
+        // Prev (Previous page in rootline)
+        if (!empty($prevPageUrl)) {
+            $this->metaTagList['link.rel.prev'] = array(
+                'tag' => 'link',
+                'attributes' => array(
+                    'rel' => 'prev',
+                    'href' => $prevPageUrl,
+                ),
+            );
+        }
+    }
 
     /**
      * Generate a link via TYPO3-Api
      *
-     * @param    integer|string $url       URL (id or string)
-     * @param    array|NULL     $conf      URL configuration
-     * @param    boolean        $disableMP Disable mountpoint linking
+     * @param    integer|string $url URL (id or string)
+     * @param    array|NULL $conf    URL configuration
+     * @param    boolean $disableMP  Disable mountpoint linking
      *
      * @return   string                      URL
      */
-    protected function generateLink($url, $conf = null, $disableMP = false) {
+    protected function generateLink($url, $conf = null, $disableMP = false)
+    {
         if ($conf === null) {
             $conf = array();
         }
@@ -360,22 +950,51 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Generate CanonicalUrl MetaTags
+     */
+    protected function generateCanonicalUrlMetaTags()
+    {
+        $canonicalUrl = null;
+
+        if (!empty($this->pageRecord['tx_metaseo_canonicalurl'])) {
+            $canonicalUrl = $this->pageRecord['tx_metaseo_canonicalurl'];
+        } elseif (!empty($this->tsSetupSeo['canonicalUrl'])) {
+            list($clUrl, $clLinkConf, $clDisableMpMode) = $this->detectCanonicalPage($this->tsSetupSeo['canonicalUrl.']);
+        }
+
+        if (!empty($clUrl)) {
+            $canonicalUrl = $this->generateLink($clUrl, $clLinkConf, $clDisableMpMode);
+
+            if (!empty($canonicalUrl)) {
+                $this->metaTagList['link.rel.canonical'] = array(
+                    'tag' => 'link',
+                    'attributes' => array(
+                        'rel' => 'canonical',
+                        'href' => $canonicalUrl,
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
      * Detect canonical page
      *
      * @param    array $tsConfig TypoScript config setup
      *
      * @return   string            Page Id or url
      */
-    protected function detectCanonicalPage($tsConfig = array()) {
+    protected function detectCanonicalPage($tsConfig = array())
+    {
         #####################
         # Fetch typoscript config
         #####################
-        $strictMode = (bool)(int)$tsConfig['strict'];
-        $noMpMode   = (bool)(int)$tsConfig['noMP'];
-        $linkConf   = !empty($tsConfig['typolink.']) ? $tsConfig['typolink.'] : array();
-        $blacklist  = !empty($tsConfig['blacklist.']) ? $tsConfig['blacklist.'] : array();
+        $strictMode = (bool) (int) $tsConfig['strict'];
+        $noMpMode = (bool) (int) $tsConfig['noMP'];
+        $linkConf = !empty($tsConfig['typolink.']) ? $tsConfig['typolink.'] : array();
+        $blacklist = !empty($tsConfig['blacklist.']) ? $tsConfig['blacklist.'] : array();
 
-        $linkParam  = null;
+        $linkParam = null;
         $linkMpMode = false;
 
         // Init link configuration
@@ -483,14 +1102,54 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     }
 
     /**
+     * Generate OpenGraph MetaTags
+     */
+    protected function generateOpenGraphMetaTags()
+    {
+        $this->tsSetupSeoOg = $this->tsSetupSeo['opengraph.'];
+
+        // Get list of tags (filtered array)
+        $ogTagNameList = array_keys($this->tsSetupSeoOg);
+        $ogTagNameList = array_unique(array_map(function ($item) {
+            return rtrim($item, '.');
+        }, $ogTagNameList));
+
+        foreach ($ogTagNameList as $ogTagName) {
+            $ogTagValue = null;
+
+            // Check if TypoScript value is a simple one (eg. title = foo)
+            // or it is a cObject
+            if (!empty($this->tsSetupSeoOg[$ogTagName]) && !array_key_exists($ogTagName . '.', $this->tsSetupSeoOg)) {
+                // Simple value
+                $ogTagValue = $this->tsSetupSeoOg[$ogTagName];
+            } elseif (!empty($this->tsSetupSeoOg[$ogTagName])) {
+                // Content object (eg. TEXT)
+                $ogTagValue = $this->cObj->cObjGetSingle($this->tsSetupSeoOg[$ogTagName],
+                    $this->tsSetupSeoOg[$ogTagName . '.']);
+            }
+
+            if ($ogTagValue !== null && strlen($ogTagValue) >= 1) {
+                $this->metaTagList['og.' . $ogTagName] = array(
+                    'tag' => 'meta',
+                    'attributes' => array(
+                        'property' => 'og:' . $ogTagName,
+                        'content' => $ogTagValue,
+                    ),
+                );
+            }
+        }
+    }
+
+    /**
      * Advanced meta tags
      *
-     * @param array   $metaTags          MetaTags
-     * @param array   $this->pageRecord          TSFE Page
-     * @param integer $sysLanguageId     Sys Language ID
-     * @param array   $customMetaTagList Custom Meta Tag list
+     * @param array $metaTags          MetaTags
+     * @param array $this              ->pageRecord          TSFE Page
+     * @param integer $sysLanguageId   Sys Language ID
+     * @param array $customMetaTagList Custom Meta Tag list
      */
-    protected function advMetaTags(&$metaTags, $pageRecord, $sysLanguageId, $customMetaTagList) {
+    protected function advMetaTags(&$metaTags, $pageRecord, $sysLanguageId, $customMetaTagList)
+    {
         $this->pageRecordId = $this->pageRecord['uid'];
 
         $connector = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
@@ -499,7 +1158,7 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
         // #################
         // Adv meta tags (from editor)
         // #################
-        $advMetaTagList      = array();
+        $advMetaTagList = array();
         $advMetaTagCondition = array();
 
         if (!empty($storeMeta['flag']['meta:og:external'])) {
@@ -519,11 +1178,11 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
         }
 
         // Fetch list of meta tags from database
-        $query          = 'SELECT tag_name,
+        $query = 'SELECT tag_name,
                                   tag_value
                              FROM tx_metaseo_metatag
-                            WHERE pid = ' . (int)$this->pageRecordId . '
-                              AND sys_language_uid = ' . (int)$sysLanguageId . '
+                            WHERE pid = ' . (int) $this->pageRecordId . '
+                              AND sys_language_uid = ' . (int) $sysLanguageId . '
                               AND ' . $advMetaTagCondition;
         $advMetaTagList = DatabaseUtility::getList($query);
 
@@ -555,7 +1214,8 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
     /**
      * Process meta tags
      */
-    protected function processMetaTags(&$tags) {
+    protected function processMetaTags(&$tags)
+    {
         // Call hook
         \Metaseo\Metaseo\Utility\GeneralUtility::callHookAndSignal(__CLASS__, 'metatagOutput', $this, $tags);
 
@@ -591,7 +1251,6 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
         }
     }
 
-
     /**
      * Render meta tags
      *
@@ -599,13 +1258,14 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
      *
      * @return string
      */
-    protected function renderMetaTags(array $metaTags) {
+    protected function renderMetaTags(array $metaTags)
+    {
         $ret = array();
 
         $isXtml = $this->isXhtml();
 
         foreach ($metaTags as $metaTag) {
-            $tag        = $metaTag['tag'];
+            $tag = $metaTag['tag'];
 
             $attributes = array();
 
@@ -621,668 +1281,29 @@ class MetatagPart extends \Metaseo\Metaseo\Page\Part\AbstractPart {
         }
 
         $separator = "\n";
+
         return $separator . implode($separator, $ret) . $separator;
     }
 
     /**
-     * Collect meta data (eg. from page via stdwrap)
-     */
-    protected function collectMetaDataFromPage() {
-        // #################
-        // Page meta
-        // #################
-
-        // description
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['description_page'],
-            $this->tsSetupSeo['conf.']['description_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['description'] = $tmp;
-        }
-
-        // keywords
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['keywords_page'],
-            $this->tsSetupSeo['conf.']['keywords_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['keywords'] = $tmp;
-        }
-
-        // title
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['title_page'],
-            $this->tsSetupSeo['conf.']['title_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['title'] = $tmp;
-        }
-
-        // author
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['author_page'],
-            $this->tsSetupSeo['conf.']['author_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['author'] = $tmp;
-        }
-
-        // email
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['email_page'],
-            $this->tsSetupSeo['conf.']['email_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['email'] = $tmp;
-        }
-
-        // last-update
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['lastUpdate_page'],
-            $this->tsSetupSeo['conf.']['lastUpdate_page.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['lastUpdate'] = $tmp;
-        }
-
-        // #################
-        // Geo
-        // #################
-
-        // tx_metaseo_geo_lat
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_lat'],
-            $this->tsSetupSeo['conf.']['tx_metaseo_geo_lat.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['geoPositionLatitude'] = $tmp;
-        }
-
-        // tx_metaseo_geo_long
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_long'],
-            $this->tsSetupSeo['conf.']['tx_metaseo_geo_long.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['geoPositionLongitude'] = $tmp;
-        }
-
-        // tx_metaseo_geo_place
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_place'],
-            $this->tsSetupSeo['conf.']['tx_metaseo_geo_place.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['geoPlacename'] = $tmp;
-        }
-
-        // tx_metaseo_geo_region
-        $tmp = $this->cObj->stdWrap($this->tsSetupSeo['conf.']['tx_metaseo_geo_region'],
-            $this->tsSetupSeo['conf.']['tx_metaseo_geo_region.']);
-        if (!empty($tmp)) {
-            $this->pageMeta['geoRegion'] = $tmp;
-        }
-
-        // #################
-        // Process meta tags
-        // #################
-
-        // process page meta data
-        foreach ($this->pageMeta as $metaKey => $metaValue) {
-            $metaValue = trim($metaValue);
-
-            if (!empty($metaValue)) {
-                $this->tsSetupSeo[$metaKey] = $metaValue;
-            }
-        }
-    }
-
-    /**
-     * Collect metadata from connector
+     * Check if page is configured as XHTML
      *
-     * @return mixed
+     * @return bool
      */
-    protected function collectMetaDataFromConnector() {
-        $ret = array();
+    protected function isXhtml()
+    {
+        $ret = false;
 
-        /** @var \Metaseo\Metaseo\Connector $connector */
-        $connector = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
-        $storeMeta = $connector->getStore();
-
-        // Std meta tags
-        foreach ($storeMeta['meta'] as $metaKey => $metaValue) {
-            $metaValue = trim($metaValue);
-
-            if ($metaValue === null) {
-                // Remove meta
-                unset($this->tsSetupSeo[$metaKey]);
-            } elseif (!empty($metaValue)) {
-                $this->tsSetupSeo[$metaKey] = $metaValue;
-            }
+        if (strpos($GLOBALS['TSFE']->config['config']['doctype'], 'xhtml') !== false) {
+            // doctype xhtml
+            $ret = true;
         }
 
-        // Custom meta tags
-        foreach ($storeMeta['custom'] as $metaKey => $metaValue) {
-            $metaValue = trim($metaValue);
-
-            if ($metaValue === null) {
-                // Remove meta
-                unset($ret[$metaKey]);
-            } elseif (!empty($metaValue)) {
-                $ret[$metaKey] = $metaValue;
-            }
+        if (strpos($GLOBALS['TSFE']->config['config']['xhtmlDoctype'], 'xhtml') !== false) {
+            // doctype xhtml doctype
+            $ret = true;
         }
 
         return $ret;
-    }
-
-    /**
-     * Generate standard metatags
-     */
-    protected function generateStandardMetaTags() {
-        // dc schema
-        if ($this->enableMetaDc && !$this->isHtml5()) {
-            //schema.DCTERMS not allowed in HTML5 according to W3C validator #18
-            $this->metaTagList['meta.schema.dc'] = array(
-                'tag'        => 'link',
-                'attributes' => array(
-                    'rel'  => 'schema.DCTERMS',
-                    'href' => 'http://purl.org/dc/terms/',
-                ),
-            );
-        }
-
-        // title
-        if (!empty($this->tsSetupSeo['title']) && $this->enableMetaDc) {
-            $this->metaTagList['meta.title'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'DCTERMS.title',
-                    'content' => $this->tsSetupSeo['title'],
-                ),
-            );
-        }
-
-        // description
-        if (!empty($this->tsSetupSeo['description'])) {
-            $this->metaTagList['meta.description'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'description',
-                    'content' => $this->tsSetupSeo['description'],
-                ),
-            );
-
-            if ($this->enableMetaDc) {
-                $this->metaTagList['meta.description.dc'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'name'    => 'DCTERMS.description',
-                        'content' => $this->tsSetupSeo['description'],
-                    ),
-                );
-            }
-        }
-
-        // keywords
-        if (!empty($this->tsSetupSeo['keywords'])) {
-            $this->metaTagList['meta.keywords'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'keywords',
-                    'content' => $this->tsSetupSeo['keywords'],
-                ),
-            );
-
-            if ($this->enableMetaDc) {
-                $this->metaTagList['meta.keywords.dc'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'name'    => 'DCTERMS.subject',
-                        'content' => $this->tsSetupSeo['keywords'],
-                    ),
-                );
-            }
-        }
-
-        // copyright
-        if (!empty($this->tsSetupSeo['copyright'])) {
-            $this->metaTagList['meta.copyright'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'copyright',
-                    'content' => $this->tsSetupSeo['copyright'],
-                ),
-            );
-
-            if ($this->enableMetaDc) {
-                $this->metaTagList['meta.copyright.dc'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'name'    => 'DCTERMS.rights',
-                        'content' => $this->tsSetupSeo['copyright'],
-                    ),
-                );
-            }
-        }
-
-        // email
-        if (!empty($this->tsSetupSeo['email'])) {
-            $this->metaTagList['meta.email.link'] = array(
-                'tag'        => 'link',
-                'attributes' => array(
-                    'rev'  => 'made',
-                    'href' => 'mailto:' . $this->tsSetupSeo['email'],
-                ),
-            );
-
-            $this->metaTagList['meta.email.http'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'http-equiv' => 'reply-to',
-                    'content'    => $this->tsSetupSeo['email'],
-                ),
-            );
-        }
-
-        // author
-        if (!empty($this->tsSetupSeo['author'])) {
-            $this->metaTagList['meta.author'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'author',
-                    'content' => $this->tsSetupSeo['author'],
-                ),
-            );
-
-            if ($this->enableMetaDc) {
-                $this->metaTagList['meta.author.dc'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'name'    => 'DCTERMS.creator',
-                        'content' => $this->tsSetupSeo['author'],
-                    ),
-                );
-            }
-        }
-
-        // author
-        if (!empty($this->tsSetupSeo['publisher']) && $this->enableMetaDc) {
-            $this->metaTagList['meta.publisher.dc'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'DCTERMS.publisher',
-                    'content' => $this->tsSetupSeo['publisher'],
-                ),
-            );
-        }
-
-        // distribution
-        if (!empty($this->tsSetupSeo['distribution'])) {
-            $this->metaTagList['meta.distribution'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'distribution',
-                    'content' => $this->tsSetupSeo['distribution'],
-                ),
-            );
-        }
-
-        // rating
-        if (!empty($this->tsSetupSeo['rating'])) {
-            $this->metaTagList['meta.rating'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'rating',
-                    'content' => $this->tsSetupSeo['rating'],
-                ),
-            );
-        }
-
-        // last-update
-        if (!empty($this->tsSetupSeo['useLastUpdate']) && !empty($this->tsSetupSeo['lastUpdate'])) {
-            $this->metaTagList['meta.date'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'date',
-                    'content' => $this->tsSetupSeo['lastUpdate'],
-                ),
-            );
-
-            if ($this->enableMetaDc) {
-                $this->metaTagList['meta.date.dc'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'name'    => 'DCTERMS.date',
-                        'content' => $this->tsSetupSeo['lastUpdate'],
-                    ),
-                );
-            }
-        }
-
-        // expire
-        if (!empty($this->tsSetupSeo['useExpire']) && !empty($this->pageRecord['endtime'])) {
-            $this->metaTagList['meta.expire'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'googlebot',
-                    'content' => 'unavailable_after: ' . date('d-M-Y H:i:s T', $this->pageRecord['endtime']),
-                ),
-            );
-        }
-    }
-
-    /**
-     * Genrate crawler (eg. robots) MetaTags
-     */
-    protected function generateCrawlerMetaTags() {
-        // robots
-        if (!empty($this->tsSetupSeo['robotsEnable'])) {
-            $crawlerOrder = array();
-
-            if (!empty($this->tsSetupSeo['robotsIndex']) && empty($this->pageRecord['tx_metaseo_is_exclude'])) {
-                $crawlerOrder['index'] = 'index';
-            } else {
-                $crawlerOrder['index'] = 'noindex';
-            }
-
-            if (!empty($this->tsSetupSeo['robotsFollow'])) {
-                $crawlerOrder['follow'] = 'follow';
-            } else {
-                $crawlerOrder['follow'] = 'nofollow';
-            }
-
-            if (empty($this->tsSetupSeo['robotsArchive'])) {
-                $crawlerOrder['archive'] = 'noarchive';
-            }
-
-            if (empty($this->tsSetupSeo['robotsSnippet'])) {
-                $crawlerOrder['snippet'] = 'nosnippet';
-            }
-
-            if (!empty($this->tsSetupSeo['robotsNoImageindex']) && $this->tsSetupSeo['robotsNoImageindex'] === '1') {
-                $crawlerOrder['noimageindex'] = 'noimageindex';
-            }
-
-            if (!empty($this->tsSetupSeo['robotsNoTranslate']) && $this->tsSetupSeo['robotsNoTranslate'] === '1') {
-                $crawlerOrder['notranslate'] = 'notranslate';
-            }
-
-            if (empty($this->tsSetupSeo['robotsOdp'])) {
-                $crawlerOrder['odp'] = 'noodp';
-            }
-
-            if (empty($this->tsSetupSeo['robotsYdir'])) {
-                $crawlerOrder['ydir'] = 'noydir';
-            }
-
-
-            $this->metaTagList['crawler.robots'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'robots',
-                    'content' => implode(',', $crawlerOrder),
-                ),
-            );
-        }
-
-        // revisit
-        if (!empty($this->tsSetupSeo['revisit'])) {
-            $this->metaTagList['crawler.revisit'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'revisit-after',
-                    'content' => $this->tsSetupSeo['revisit'],
-                ),
-            );
-        }
-    }
-
-    /**
-     * Generate geo position MetaTags
-     */
-    protected function generateGeoPosMetaTags() {
-        // Geo-Position
-        if (!empty($this->tsSetupSeo['geoPositionLatitude']) && !empty($this->tsSetupSeo['geoPositionLongitude'])) {
-            $this->metaTagList['geo.icmb']     = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'ICBM',
-                    'content' => $this->tsSetupSeo['geoPositionLatitude'] . ', ' . $this->tsSetupSeo['geoPositionLongitude'],
-                ),
-            );
-            $this->metaTagList['geo.position'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'geo.position',
-                    'content' => $this->tsSetupSeo['geoPositionLatitude'] . ';' . $this->tsSetupSeo['geoPositionLongitude'],
-                ),
-            );
-        }
-
-        // Geo-Region
-        if (!empty($this->tsSetupSeo['geoRegion'])) {
-            $this->metaTagList['geo.region'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'geo.region',
-                    'content' => $this->tsSetupSeo['geoRegion'],
-                ),
-            );
-        }
-
-        // Geo Placename
-        if (!empty($this->tsSetupSeo['geoPlacename'])) {
-            $this->metaTagList['geo.placename'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'geo.placename',
-                    'content' => $this->tsSetupSeo['geoPlacename'],
-                ),
-            );
-        }
-    }
-
-    /**
-     * Generate service (eg. google) MetaTags
-     */
-    protected function generateServicesMetaTags() {
-        // Google Verification
-        if (!empty($this->tsSetupSeo['googleVerification'])) {
-            $this->metaTagList['service.verification.google'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'google-site-verification',
-                    'content' => $this->tsSetupSeo['googleVerification'],
-                ),
-            );
-        }
-
-        // MSN Verification
-        if (!empty($this->tsSetupSeo['msnVerification'])) {
-            $this->metaTagList['service.verification.msn'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'msvalidate.01',
-                    'content' => $this->tsSetupSeo['msnVerification'],
-                ),
-            );
-        }
-
-        // Yahoo Verification
-        if (!empty($this->tsSetupSeo['yahooVerification'])) {
-            $this->metaTagList['service.verification.yahoo'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'y_key',
-                    'content' => $this->tsSetupSeo['yahooVerification'],
-                ),
-            );
-        }
-
-        // WebOfTrust Verification
-        if (!empty($this->tsSetupSeo['wotVerification'])) {
-            $this->metaTagList['service.verification.wot'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'name'    => 'wot-verification',
-                    'content' => $this->tsSetupSeo['wotVerification'],
-                ),
-            );
-        }
-
-
-        // PICS label
-        if (!empty($this->tsSetupSeo['picsLabel'])) {
-            $this->metaTagList['service.pics'] = array(
-                'tag'        => 'meta',
-                'attributes' => array(
-                    'http-equiv' => 'PICS-Label',
-                    'content'    => $this->tsSetupSeo['picsLabel'],
-                ),
-            );
-        }
-    }
-
-    /**
-     * Generate user agent metatags
-     */
-    protected function generateUserAgentMetaTags() {
-        if (!empty($this->tsSetupSeo['ieCompatibilityMode'])) {
-            if (is_numeric($this->tsSetupSeo['ieCompatibilityMode'])) {
-                $this->metaTagList['ua.msie.compat'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'http-equiv' => 'X-UA-Compatible',
-                        'content'    => 'IE=EmulateIE' . (int)$this->tsSetupSeo['ieCompatibilityMode'],
-                    ),
-                );
-            } else {
-                $this->metaTagList['ua.msie.compat'] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'http-equiv' => 'X-UA-Compatible',
-                        'content'    => $this->tsSetupSeo['ieCompatibilityMode'],
-                    ),
-                );
-            }
-        }
-    }
-
-    /**
-     * Generate Link (next, prev..) MetaTags
-     */
-    protected function generateLinkMetaTags() {
-        $rootLine = \Metaseo\Metaseo\Utility\GeneralUtility::getRootLine();
-
-        $currentPage = end($rootLine);
-        $rootPage    = reset($rootLine);
-
-        $currentIsRootpage = ($currentPage['uid'] === $rootPage['uid']);
-
-        // Generate rootpage url
-        $rootPageUrl = null;
-        if (!empty($rootPage)) {
-            $rootPageUrl = $this->generateLink($rootPage['uid']);
-        }
-
-        // Only generate up, prev and next if NOT rootpage
-        // to prevent linking to other domains
-        // see https://github.com/mblaschke/TYPO3-metaseo/issues/5
-        if (!$currentIsRootpage) {
-
-            $prevPage    = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['prev.']);
-            $prevPageUrl = null;
-            if (!empty($prevPage)) {
-                $prevPageUrl = $this->generateLink($prevPage);
-            }
-
-            $nextPage    = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['next.']);
-            $nextPageUrl = null;
-            if (!empty($nextPage)) {
-                $nextPageUrl = $this->generateLink($nextPage);
-            }
-        }
-
-        // Root (First page in rootline)
-        if (!empty($rootPageUrl)) {
-            $this->metaTagList['link.rel.start'] = array(
-                'tag'        => 'link',
-                'attributes' => array(
-                    'rel'  => 'start',
-                    'href' => $rootPageUrl,
-                ),
-            );
-        }
-
-        // Next (Next page in rootline)
-        if (!empty($nextPageUrl)) {
-            $this->metaTagList['link.rel.next'] = array(
-                'tag'        => 'link',
-                'attributes' => array(
-                    'rel'  => 'next',
-                    'href' => $nextPageUrl,
-                ),
-            );
-        }
-
-        // Prev (Previous page in rootline)
-        if (!empty($prevPageUrl)) {
-            $this->metaTagList['link.rel.prev'] = array(
-                'tag'        => 'link',
-                'attributes' => array(
-                    'rel'  => 'prev',
-                    'href' => $prevPageUrl,
-                ),
-            );
-        }
-    }
-
-    /**
-     * Generate CanonicalUrl MetaTags
-     */
-    protected function generateCanonicalUrlMetaTags() {
-        $canonicalUrl = null;
-
-        if (!empty($this->pageRecord['tx_metaseo_canonicalurl'])) {
-            $canonicalUrl = $this->pageRecord['tx_metaseo_canonicalurl'];
-        } elseif (!empty($this->tsSetupSeo['canonicalUrl'])) {
-            list($clUrl, $clLinkConf, $clDisableMpMode) = $this->detectCanonicalPage($this->tsSetupSeo['canonicalUrl.']);
-        }
-
-        if (!empty($clUrl)) {
-            $canonicalUrl = $this->generateLink($clUrl, $clLinkConf, $clDisableMpMode);
-
-            if (!empty($canonicalUrl)) {
-                $this->metaTagList['link.rel.canonical'] = array(
-                    'tag'        => 'link',
-                    'attributes' => array(
-                        'rel'  => 'canonical',
-                        'href' => $canonicalUrl,
-                    ),
-                );
-            }
-        }
-    }
-
-    /**
-     * Generate OpenGraph MetaTags
-     */
-    protected function generateOpenGraphMetaTags() {
-        $this->tsSetupSeoOg = $this->tsSetupSeo['opengraph.'];
-
-        // Get list of tags (filtered array)
-        $ogTagNameList = array_keys($this->tsSetupSeoOg);
-        $ogTagNameList = array_unique(array_map(function ($item) {
-            return rtrim($item, '.');
-        }, $ogTagNameList));
-
-        foreach ($ogTagNameList as $ogTagName) {
-            $ogTagValue = null;
-
-            // Check if TypoScript value is a simple one (eg. title = foo)
-            // or it is a cObject
-            if (!empty($this->tsSetupSeoOg[$ogTagName]) && !array_key_exists($ogTagName . '.', $this->tsSetupSeoOg)) {
-                // Simple value
-                $ogTagValue = $this->tsSetupSeoOg[$ogTagName];
-            } elseif (!empty($this->tsSetupSeoOg[$ogTagName])) {
-                // Content object (eg. TEXT)
-                $ogTagValue = $this->cObj->cObjGetSingle($this->tsSetupSeoOg[$ogTagName],
-                    $this->tsSetupSeoOg[$ogTagName . '.']);
-            }
-
-            if ($ogTagValue !== null && strlen($ogTagValue) >= 1) {
-                $this->metaTagList['og.' . $ogTagName] = array(
-                    'tag'        => 'meta',
-                    'attributes' => array(
-                        'property' => 'og:' . $ogTagName,
-                        'content'  => $ogTagValue,
-                    ),
-                );
-            }
-        }
     }
 }

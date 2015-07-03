@@ -29,19 +29,24 @@ namespace Metaseo\Metaseo\Utility;
 /**
  * General utility
  */
-class FrontendUtility {
+class FrontendUtility
+{
 
     /**
      * Init TSFE with all needed classes eg. for backend usage ($GLOBALS['TSFE'])
      *
-     * @param integer      $pageUid      PageUID
-     * @param null|array   $rootLine     Rootline
-     * @param null|array   $pageData     Page data array
-     * @param null|array   $rootlineFull Full rootline
-     * @param null|integer $sysLanguage  Sys language uid
+     * @param integer $pageUid          PageUID
+     * @param null|array $rootLine      Rootline
+     * @param null|array $pageData      Page data array
+     * @param null|array $rootlineFull  Full rootline
+     * @param null|integer $sysLanguage Sys language uid
      */
     public static function init(
-        $pageUid, $rootLine = null, $pageData = null, $rootlineFull = null, $sysLanguage = null
+        $pageUid,
+        $rootLine = null,
+        $pageData = null,
+        $rootlineFull = null,
+        $sysLanguage = null
     ) {
         static $cacheTSFE = array();
         static $lastTsSetupPid = null;
@@ -71,7 +76,7 @@ class FrontendUtility {
             /** @var \TYPO3\CMS\Frontend\Page\PageRepository $sysPageObj */
             $sysPageObj = $objectManager->get('TYPO3\\CMS\\Frontend\\Page\\PageRepository');
             $sysPageObj->sys_language_uid = $sysLanguage;
-            $rootLine   = $sysPageObj->getRootLine($pageUid);
+            $rootLine = $sysPageObj->getRootLine($pageUid);
 
             // save full rootline, we need it in TSFE
             $rootlineFull = $rootLine;
@@ -101,7 +106,7 @@ class FrontendUtility {
                 $_GET['id'] = $pageUid;
 
                 // Init TSFE
-                $GLOBALS['TSFE']       = $tsfeController;
+                $GLOBALS['TSFE'] = $tsfeController;
                 $GLOBALS['TSFE']->cObj = $cObjRenderer;
                 $GLOBALS['TSFE']->initFEuser();
                 $GLOBALS['TSFE']->determineId();
@@ -124,8 +129,8 @@ class FrontendUtility {
             $lastTsSetupPid = $pageUid;
         }
 
-        $GLOBALS['TSFE']->page       = $pageData;
-        $GLOBALS['TSFE']->rootLine   = $rootlineFull;
+        $GLOBALS['TSFE']->page = $pageData;
+        $GLOBALS['TSFE']->rootLine = $rootlineFull;
         $GLOBALS['TSFE']->cObj->data = $pageData;
     }
 
@@ -136,8 +141,39 @@ class FrontendUtility {
      *
      * @return bool
      */
-    public static function checkPageForBlacklist($blacklist) {
+    public static function checkPageForBlacklist($blacklist)
+    {
         return \Metaseo\Metaseo\Utility\GeneralUtility::checkUrlForBlacklisting(self::getCurrentUrl(), $blacklist);
+    }
+
+    /**
+     * Return current URL
+     *
+     * @return null|string
+     */
+    public static function getCurrentUrl()
+    {
+        $ret = null;
+
+        $TSFE = self::getTsfe();
+
+        if (!empty($TSFE->anchorPrefix)) {
+            $ret = (string) $TSFE->anchorPrefix;
+        } else {
+            $ret = (string) $TSFE->siteScript;
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Get TSFE
+     *
+     * @return \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController
+     */
+    public static function getTsfe()
+    {
+        return $GLOBALS['TSFE'];
     }
 
     /**
@@ -145,7 +181,8 @@ class FrontendUtility {
      *
      * @return bool
      */
-    public static function isCacheable() {
+    public static function isCacheable()
+    {
         $TSFE = self::getTsfe();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !empty($TSFE->fe_user->user['uid'])
@@ -164,34 +201,6 @@ class FrontendUtility {
         }
 
         return true;
-    }
-
-    /**
-     * Return current URL
-     *
-     * @return null|string
-     */
-    public static function getCurrentUrl() {
-        $ret = null;
-
-        $TSFE = self::getTsfe();
-
-        if (!empty($TSFE->anchorPrefix)) {
-            $ret = (string)$TSFE->anchorPrefix;
-        } else {
-            $ret = (string)$TSFE->siteScript;
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Get TSFE
-     *
-     * @return \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController
-     */
-    public static function getTsfe() {
-        return $GLOBALS['TSFE'];
     }
 
 }

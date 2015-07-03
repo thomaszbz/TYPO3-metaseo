@@ -32,7 +32,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 /**
  * Scheduler Task Sitemap Base
  */
-abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
+abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
+{
 
     // ########################################################################
     // Attributes
@@ -67,7 +68,8 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
     /**
      * Initialize task
      */
-    protected function initialize() {
+    protected function initialize()
+    {
         $this->objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
     }
 
@@ -76,14 +78,15 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
      *
      * @return  array
      */
-    protected function getRootPages() {
+    protected function getRootPages()
+    {
         $ret = array();
 
         $query = 'SELECT uid
                     FROM pages
                    WHERE is_siteroot = 1
                      AND deleted = 0';
-        $ret   = DatabaseUtility::getColWithIndex($query);
+        $ret = DatabaseUtility::getColWithIndex($query);
 
         return $ret;
     }
@@ -94,10 +97,11 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
      *
      * @return  array
      */
-    protected function initLanguages() {
+    protected function initLanguages()
+    {
         $this->languageIdList[0] = 0;
 
-        $query      = 'SELECT uid
+        $query = 'SELECT uid
                          FROM sys_language
                         WHERE hidden = 0';
         $langIdList = DatabaseUtility::getColWithIndex($query);
@@ -108,9 +112,10 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
     /**
      * Set root page language
      */
-    protected function setRootPageLanguage($languageId) {
+    protected function setRootPageLanguage($languageId)
+    {
         $GLOBALS['TSFE']->tmpl->setup['config.']['sys_language_uid'] = $languageId;
-        $this->languageLock                                          = $languageId;
+        $this->languageLock = $languageId;
     }
 
     /**
@@ -118,7 +123,8 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
      *
      * @param   integer $rootPageId $rootPageId
      */
-    protected function initRootPage($rootPageId) {
+    protected function initRootPage($rootPageId)
+    {
         \Metaseo\Metaseo\Utility\FrontendUtility::init($rootPageId);
     }
 
@@ -130,7 +136,8 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
      *
      * @throws  \Exception
      */
-    protected function writeToFile($file, $content) {
+    protected function writeToFile($file, $content)
+    {
         if (!function_exists('gzopen')) {
             throw new \Exception('metaseo needs zlib support');
         }

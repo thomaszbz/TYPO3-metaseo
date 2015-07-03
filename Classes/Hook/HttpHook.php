@@ -32,12 +32,14 @@ use Metaseo\Metaseo\Utility\GeneralUtility;
 /**
  * Http Header generator
  */
-class HttpHook {
+class HttpHook
+{
 
     /**
      * Add HTTP Headers
      */
-    public function main() {
+    public function main()
+    {
         // INIT
         $tsSetup = $GLOBALS['TSFE']->tmpl->setup;
         $headers = array();
@@ -48,12 +50,13 @@ class HttpHook {
         }
 
         // Init caches
-        $cacheIdentification = $GLOBALS['TSFE']->id . '_' . substr(sha1(FrontendUtility::getCurrentUrl()),10,30) . '_http';
+        $cacheIdentification = $GLOBALS['TSFE']->id . '_' . substr(sha1(FrontendUtility::getCurrentUrl()), 10,
+                30) . '_http';
 
         /** @var \TYPO3\CMS\Core\Cache\CacheManager $cacheManager */
         $objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $cacheManager  = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
-        $cache         = $cacheManager->getCache('cache_pagesection');
+        $cacheManager = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+        $cache = $cacheManager->getCache('cache_pagesection');
 
         if (!empty($GLOBALS['TSFE']->tmpl->loaded)) {
             // ##################################
@@ -66,7 +69,7 @@ class HttpHook {
                 // ##################################
                 // W3C P3P Tags
                 // ##################################
-                $p3pCP        = null;
+                $p3pCP = null;
                 $p3pPolicyUrl = null;
 
                 if (!empty($tsSetupSeo['p3pCP'])) {

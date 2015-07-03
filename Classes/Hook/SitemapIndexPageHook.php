@@ -33,39 +33,18 @@ use Metaseo\Metaseo\Utility\SitemapUtility;
 /**
  * Sitemap Indexer
  */
-class SitemapIndexPageHook extends SitemapIndexHook {
+class SitemapIndexPageHook extends SitemapIndexHook
+{
 
-
-
-    /**
-     * Init configuration
-     */
-    protected function initConfiguration() {
-        parent::initConfiguration();
-
-        // Check custom index expiration (from connector)
-        /** @var \Metaseo\Metaseo\Connector $connector */
-        $connector    = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
-        $sitemapStore = $connector->getStore('sitemap');
-
-        // Set new expiration date
-        if (!empty($sitemapStore['expiration'])) {
-            $this->indexExpiration = $_SERVER['REQUEST_TIME'] + ($sitemapStore['expiration'] * 24 * 60 * 60);
-        }
-
-    }
-
-    // ########################################################################
-    // HOOKS
-    // ########################################################################
 
     /**
      * Hook: Index Page Content
      */
-    public function hook_indexContent() {
+    public function hook_indexContent()
+    {
         $this->addPageToSitemapIndex();
 
-        $possibility = (int)GeneralUtility::getExtConf('sitemap_clearCachePossibility', 0);
+        $possibility = (int) GeneralUtility::getExtConf('sitemap_clearCachePossibility', 0);
 
         if ($possibility > 0) {
 
@@ -77,7 +56,7 @@ class SitemapIndexPageHook extends SitemapIndexHook {
     }
 
     // ########################################################################
-    // Methods
+    // HOOKS
     // ########################################################################
 
     /**
@@ -85,7 +64,8 @@ class SitemapIndexPageHook extends SitemapIndexHook {
      *
      * @return void
      */
-    public function addPageToSitemapIndex() {
+    public function addPageToSitemapIndex()
+    {
         if (!$this->checkIfSitemapIndexingIsEnabled('page')) {
             return;
         }
@@ -104,43 +84,17 @@ class SitemapIndexPageHook extends SitemapIndexHook {
         }
     }
 
-    /**
-     * Generate sitemap page data
-     *
-     * @param string $pageUrl Page url
-     *
-     * @return array
-     */
-    protected function generateSitemapPageData($pageUrl) {
-        $page = $GLOBALS['TSFE']->page;
-
-        $tstamp = $_SERVER['REQUEST_TIME'];
-
-        $ret = array(
-            'tstamp'                => $tstamp,
-            'crdate'                => $tstamp,
-            'page_rootpid'          => GeneralUtility::getRootPid(),
-            'page_uid'              => $GLOBALS['TSFE']->id,
-            'page_language'         => GeneralUtility::getLanguageId(),
-            'page_url'              => $pageUrl,
-            'page_depth'            => count($GLOBALS['TSFE']->rootLine),
-            'page_change_frequency' => $this->getPageChangeFrequency($page),
-            'page_type'             => SitemapUtility::SITEMAP_TYPE_PAGE,
-            'expire'                => $this->indexExpiration,
-        );
-
-        // Call hook
-        GeneralUtility::callHookAndSignal(__CLASS__, 'sitemapIndexPage', $this, $ret);
-
-        return $ret;
-    }
+    // ########################################################################
+    // Methods
+    // ########################################################################
 
     /**
      * Get current page url
      *
      * @return null|string
      */
-    protected function getPageUrl() {
+    protected function getPageUrl()
+    {
         // Fetch chash
         $pageHash = null;
         if (!empty($GLOBALS['TSFE']->cHash)) {
@@ -161,5 +115,56 @@ class SitemapIndexPageHook extends SitemapIndexHook {
         }
 
         return $ret;
+    }
+
+    /**
+     * Generate sitemap page data
+     *
+     * @param string $pageUrl Page url
+     *
+     * @return array
+     */
+    protected function generateSitemapPageData($pageUrl)
+    {
+        $page = $GLOBALS['TSFE']->page;
+
+        $tstamp = $_SERVER['REQUEST_TIME'];
+
+        $ret = array(
+            'tstamp' => $tstamp,
+            'crdate' => $tstamp,
+            'page_rootpid' => GeneralUtility::getRootPid(),
+            'page_uid' => $GLOBALS['TSFE']->id,
+            'page_language' => GeneralUtility::getLanguageId(),
+            'page_url' => $pageUrl,
+            'page_depth' => count($GLOBALS['TSFE']->rootLine),
+            'page_change_frequency' => $this->getPageChangeFrequency($page),
+            'page_type' => SitemapUtility::SITEMAP_TYPE_PAGE,
+            'expire' => $this->indexExpiration,
+        );
+
+        // Call hook
+        GeneralUtility::callHookAndSignal(__CLASS__, 'sitemapIndexPage', $this, $ret);
+
+        return $ret;
+    }
+
+    /**
+     * Init configuration
+     */
+    protected function initConfiguration()
+    {
+        parent::initConfiguration();
+
+        // Check custom index expiration (from connector)
+        /** @var \Metaseo\Metaseo\Connector $connector */
+        $connector = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
+        $sitemapStore = $connector->getStore('sitemap');
+
+        // Set new expiration date
+        if (!empty($sitemapStore['expiration'])) {
+            $this->indexExpiration = $_SERVER['REQUEST_TIME'] + ($sitemapStore['expiration'] * 24 * 60 * 60);
+        }
+
     }
 }

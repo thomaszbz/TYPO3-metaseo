@@ -26,14 +26,15 @@
 
 namespace Metaseo\Metaseo\Hook;
 
-use Metaseo\Metaseo\Utility\SitemapUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\SitemapUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
  * Sitemap Indexer
  */
-abstract class SitemapIndexHook implements SingletonInterface {
+abstract class SitemapIndexHook implements SingletonInterface
+{
 
     // ########################################################################
     // Attributes
@@ -104,7 +105,8 @@ abstract class SitemapIndexHook implements SingletonInterface {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
         $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 
@@ -114,7 +116,8 @@ abstract class SitemapIndexHook implements SingletonInterface {
     /**
      * Init configuration
      */
-    protected function initConfiguration() {
+    protected function initConfiguration()
+    {
         // Get configuration
         if (!empty($GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.'])) {
             $this->conf = $GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.'];
@@ -129,7 +132,7 @@ abstract class SitemapIndexHook implements SingletonInterface {
         if (!empty($this->conf['sitemap.']['index.']['fileExtension.'])) {
             # File extensions can be a comma separated list
             foreach ($this->conf['sitemap.']['index.']['fileExtension.'] as $fileExtListRaw) {
-                $fileExtList       = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $fileExtListRaw);
+                $fileExtList = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $fileExtListRaw);
                 $this->fileExtList = array_merge($this->fileExtList, $fileExtList);
             };
         }
@@ -143,7 +146,7 @@ abstract class SitemapIndexHook implements SingletonInterface {
         $this->indexExpiration = $_SERVER['REQUEST_TIME'] + ($expirationInDays * 24 * 60 * 60);
 
         // Init blacklist for doktype (from table pages)
-        $this->doktypeBlacklist  = SitemapUtility::getDoktypeBlacklist();
+        $this->doktypeBlacklist = SitemapUtility::getDoktypeBlacklist();
 
         // Init blacklist for PAGE typenum
         $this->pageTypeBlacklist = SitemapUtility::getPageTypeBlacklist();
@@ -156,7 +159,8 @@ abstract class SitemapIndexHook implements SingletonInterface {
      *
      * @return  string
      */
-    protected static function processLinkUrl($linkUrl) {
+    protected static function processLinkUrl($linkUrl)
+    {
         static $absRefPrefix = null;
         static $absRefPrefixLength = 0;
         $ret = $linkUrl;
@@ -164,7 +168,7 @@ abstract class SitemapIndexHook implements SingletonInterface {
         // Fetch abs ref prefix if available/set
         if ($absRefPrefix === null) {
             if (!empty($GLOBALS['TSFE']->tmpl->setup['config.']['absRefPrefix'])) {
-                $absRefPrefix       = $GLOBALS['TSFE']->tmpl->setup['config.']['absRefPrefix'];
+                $absRefPrefix = $GLOBALS['TSFE']->tmpl->setup['config.']['absRefPrefix'];
                 $absRefPrefixLength = strlen($absRefPrefix);
             } else {
                 $absRefPrefix = false;
@@ -186,13 +190,14 @@ abstract class SitemapIndexHook implements SingletonInterface {
      *
      * @return integer
      */
-    protected function getPageChangeFrequency($page) {
+    protected function getPageChangeFrequency($page)
+    {
         $ret = 0;
 
         if (!empty($page['tx_metaseo_change_frequency'])) {
-            $ret = (int)$page['tx_metaseo_change_frequency'];
+            $ret = (int) $page['tx_metaseo_change_frequency'];
         } elseif (!empty($this->conf['sitemap.']['changeFrequency'])) {
-            $ret = (int)$this->conf['sitemap.']['changeFrequency'];
+            $ret = (int) $this->conf['sitemap.']['changeFrequency'];
         }
 
         if (empty($pageChangeFrequency)) {
@@ -209,10 +214,11 @@ abstract class SitemapIndexHook implements SingletonInterface {
      *
      * @return bool
      */
-    protected function checkIfSitemapIndexingIsEnabled($indexingType) {
+    protected function checkIfSitemapIndexingIsEnabled($indexingType)
+    {
         // check if sitemap is enabled in root
-        if (!GeneralUtility::getRootSettingValue('is_sitemap', true)
-            || !GeneralUtility::getRootSettingValue('is_sitemap_' . $indexingType . '_indexer', true)
+        if (!GeneralUtility::getRootSettingValue('is_sitemap',
+                true) || !GeneralUtility::getRootSettingValue('is_sitemap_' . $indexingType . '_indexer', true)
         ) {
             return false;
         }
@@ -239,7 +245,8 @@ abstract class SitemapIndexHook implements SingletonInterface {
      *
      * @return bool
      */
-    protected function checkIfCurrentPageIsIndexable() {
+    protected function checkIfCurrentPageIsIndexable()
+    {
         // check caching status
         if ($this->pageIndexFlag !== null) {
             return $this->pageIndexFlag;
@@ -262,7 +269,7 @@ abstract class SitemapIndexHook implements SingletonInterface {
         }
 
         // Check for doktype blacklisting (from current page record)
-        if (in_array((int)$GLOBALS['TSFE']->page['doktype'], $this->doktypeBlacklist)) {
+        if (in_array((int) $GLOBALS['TSFE']->page['doktype'], $this->doktypeBlacklist)) {
             return false;
         }
 

@@ -31,7 +31,8 @@ use Metaseo\Metaseo\Utility\GeneralUtility;
 /**
  * Sitemap XML generator
  */
-class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator {
+class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator
+{
 
     // ########################################################################
     // Methods
@@ -42,21 +43,22 @@ class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator 
      *
      * @return  string
      */
-    public function sitemapIndex() {
+    public function sitemapIndex()
+    {
         $pageLimit = 10000;
 
         if (isset($this->tsSetup['pageLimit']) && $this->tsSetup['pageLimit'] != '') {
-            $pageLimit = (int)$this->tsSetup['pageLimit'];
+            $pageLimit = (int) $this->tsSetup['pageLimit'];
         }
 
-        $sitemaps  = array();
+        $sitemaps = array();
         $pageItems = count($this->sitemapPages);
         $pageCount = ceil($pageItems / $pageLimit);
 
         $linkConf = array(
-            'parameter'        => GeneralUtility::getCurrentPid() . ',' . $GLOBALS['TSFE']->type,
+            'parameter' => GeneralUtility::getCurrentPid() . ',' . $GLOBALS['TSFE']->type,
             'additionalParams' => '',
-            'useCacheHash'     => 1,
+            'useCacheHash' => 1,
         );
 
         for ($i = 0; $i < $pageCount; $i++) {
@@ -97,16 +99,17 @@ class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator 
      *
      * @return  string
      */
-    public function sitemap($page = null) {
+    public function sitemap($page = null)
+    {
         $ret = '';
 
         $pageLimit = 10000;
 
         if (isset($this->tsSetup['pageLimit']) && $this->tsSetup['pageLimit'] != '') {
-            $pageLimit = (int)$this->tsSetup['pageLimit'];
+            $pageLimit = (int) $this->tsSetup['pageLimit'];
         }
 
-        $pageItems     = count($this->sitemapPages);
+        $pageItems = count($this->sitemapPages);
         $pageItemBegin = $pageLimit * ($page - 1);
 
         if ($pageItemBegin <= $pageItems) {
@@ -123,16 +126,19 @@ class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator 
      *
      * @return string
      */
-    protected function createSitemapPage() {
+    protected function createSitemapPage()
+    {
         $ret = '<?xml version="1.0" encoding="UTF-8"?>';
         $ret .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"';
         $ret .= ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"';
         $ret .= ' xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9';
         $ret .= ' http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">';
 
-        $pagePriorityDefaultValue     = (float)GeneralUtility::getRootSettingValue('sitemap_priorty', 0);
-        $pagePriorityDepthMultiplier  = (float)GeneralUtility::getRootSettingValue('sitemap_priorty_depth_multiplier', 0);
-        $pagePriorityDepthModificator = (float)GeneralUtility::getRootSettingValue('sitemap_priorty_depth_modificator', 0);
+        $pagePriorityDefaultValue = (float) GeneralUtility::getRootSettingValue('sitemap_priorty', 0);
+        $pagePriorityDepthMultiplier = (float) GeneralUtility::getRootSettingValue('sitemap_priorty_depth_multiplier',
+            0);
+        $pagePriorityDepthModificator = (float) GeneralUtility::getRootSettingValue('sitemap_priorty_depth_modificator',
+            0);
 
         if ($pagePriorityDefaultValue == 0) {
             $pagePriorityDefaultValue = 1;
@@ -162,7 +168,7 @@ class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator 
             // #####################################
             // Page priority
             // #####################################
-            $pageDepth     = $sitemapPage['page_depth'];
+            $pageDepth = $sitemapPage['page_depth'];
             $pageDepthBase = 1;
 
             if (!empty($sitemapPage['page_hash'])) {
@@ -204,13 +210,13 @@ class XmlGenerator extends \Metaseo\Metaseo\Sitemap\Generator\AbstractGenerator 
             $pageChangeFrequency = null;
             if (!empty($page['tx_metaseo_change_frequency'])) {
                 // from page
-                $pageChangeFrequency = (int)$page['tx_metaseo_change_frequency'];
+                $pageChangeFrequency = (int) $page['tx_metaseo_change_frequency'];
             } elseif (!empty($sitemapPage['page_change_frequency'])) {
                 // from sitemap settings
-                $pageChangeFrequency = (int)$sitemapPage['page_change_frequency'];
+                $pageChangeFrequency = (int) $sitemapPage['page_change_frequency'];
             } elseif (!empty($this->tsSetup['changeFrequency'])) {
                 // default from SetupTS
-                $pageChangeFrequency = (int)$this->tsSetup['changeFrequency'];
+                $pageChangeFrequency = (int) $this->tsSetup['changeFrequency'];
             }
 
             // translate change frequency

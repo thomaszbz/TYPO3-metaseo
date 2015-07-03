@@ -29,7 +29,8 @@ namespace Metaseo\Metaseo\Scheduler\Task;
 /**
  * Scheduler Task Sitemap TXT
  */
-class SitemapTxtTask extends \Metaseo\Metaseo\Scheduler\Task\AbstractSitemapTask {
+class SitemapTxtTask extends \Metaseo\Metaseo\Scheduler\Task\AbstractSitemapTask
+{
 
     // ########################################################################
     // Attributes
@@ -54,7 +55,8 @@ class SitemapTxtTask extends \Metaseo\Metaseo\Scheduler\Task\AbstractSitemapTask
      *
      * @return  boolean
      */
-    protected function buildSitemap($rootPageId, $languageId) {
+    protected function buildSitemap($rootPageId, $languageId)
+    {
 
         if ($languageId !== null) {
             // Language lock enabled
@@ -64,7 +66,7 @@ class SitemapTxtTask extends \Metaseo\Metaseo\Scheduler\Task\AbstractSitemapTask
         }
 
         $generator = $this->objectManager->get('Metaseo\\Metaseo\\Sitemap\\Generator\\TxtGenerator');
-        $content   = $generator->sitemap();
+        $content = $generator->sitemap();
 
         $fileName = sprintf($sitemapFileName, $rootPageId, $languageId);
         $this->writeToFile(PATH_site . '/' . $this->sitemapDir . '/' . $fileName, $content);

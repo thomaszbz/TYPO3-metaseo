@@ -31,24 +31,26 @@ use Metaseo\Metaseo\Utility\DatabaseUtility;
 /**
  * TYPO3 Backend ajax module sitemap
  */
-class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
+class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax
+{
 
     /**
      * Return sitemap entry list for root tree
      *
      * @return    array
      */
-    protected function executeGetList() {
+    protected function executeGetList()
+    {
         // Init
-        $rootPid      = (int)$this->postVar['pid'];
-        $offset       = (int)$this->postVar['start'];
-        $itemsPerPage = (int)$this->postVar['pagingSize'];
+        $rootPid = (int) $this->postVar['pid'];
+        $offset = (int) $this->postVar['start'];
+        $itemsPerPage = (int) $this->postVar['pagingSize'];
 
-        $searchFulltext      = trim((string)$this->postVar['criteriaFulltext']);
-        $searchPageUid       = trim((int)$this->postVar['criteriaPageUid']);
-        $searchPageLanguage  = trim((string)$this->postVar['criteriaPageLanguage']);
-        $searchPageDepth     = trim((string)$this->postVar['criteriaPageDepth']);
-        $searchIsBlacklisted = (bool)trim((string)$this->postVar['criteriaIsBlacklisted']);
+        $searchFulltext = trim((string) $this->postVar['criteriaFulltext']);
+        $searchPageUid = trim((int) $this->postVar['criteriaPageUid']);
+        $searchPageLanguage = trim((string) $this->postVar['criteriaPageLanguage']);
+        $searchPageDepth = trim((string) $this->postVar['criteriaPageDepth']);
+        $searchIsBlacklisted = (bool) trim((string) $this->postVar['criteriaIsBlacklisted']);
 
         // ############################
         // Critera
@@ -56,7 +58,7 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
         $where = array();
 
         // Root pid limit
-        $where[] = 's.page_rootpid = ' . (int)$rootPid;
+        $where[] = 's.page_rootpid = ' . (int) $rootPid;
 
         // Fulltext
         if (!empty($searchFulltext)) {
@@ -65,17 +67,17 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
 
         // Page id
         if (!empty($searchPageUid)) {
-            $where[] = 's.page_uid = ' . (int)$searchPageUid;
+            $where[] = 's.page_uid = ' . (int) $searchPageUid;
         }
 
         // Lannguage
         if ($searchPageLanguage != -1 && strlen($searchPageLanguage) >= 1) {
-            $where[] = 's.page_language = ' . (int)$searchPageLanguage;
+            $where[] = 's.page_language = ' . (int) $searchPageLanguage;
         }
 
         // Depth
         if ($searchPageDepth != -1 && strlen($searchPageDepth) >= 1) {
-            $where[] = 's.page_depth = ' . (int)$searchPageDepth;
+            $where[] = 's.page_depth = ' . (int) $searchPageDepth;
         }
 
         if ($searchIsBlacklisted) {
@@ -94,7 +96,7 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
         // ############################
 
         // Fetch total count of items with this filter settings
-        $query     = 'SELECT COUNT(*) as count
+        $query = 'SELECT COUNT(*) as count
                         FROM tx_metaseo_sitemap s
                              INNER JOIN pages p ON p.uid = s.page_uid
                        WHERE ' . $where;
@@ -129,12 +131,12 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
                         INNER JOIN pages p ON p.uid = s.page_uid
                   WHERE ' . $where . '
                ORDER BY ' . $sort . '
-                  LIMIT ' . (int)$offset . ', ' . (int)$itemsPerPage;
-        $list  = DatabaseUtility::getAll($query);
+                  LIMIT ' . (int) $offset . ', ' . (int) $itemsPerPage;
+        $list = DatabaseUtility::getAll($query);
 
         $ret = array(
             'results' => $itemCount,
-            'rows'    => $list,
+            'rows' => $list,
         );
 
         return $ret;
@@ -145,20 +147,22 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
      *
      * @return    boolean
      */
-    protected function executeBlacklist() {
+    protected function executeBlacklist()
+    {
         $uidList = $this->postVar['uidList'];
-        $rootPid = (int)$this->postVar['pid'];
+        $rootPid = (int) $this->postVar['pid'];
 
-        $uidList = DatabaseUtility::connection()->cleanIntArray($uidList);
+        $uidList = DatabaseUtility::connection()
+            ->cleanIntArray($uidList);
 
         if (empty($uidList) || empty($rootPid)) {
             return false;
         }
 
-        $where   = array();
-        $where[] = 'page_rootpid = ' . (int)$rootPid;
+        $where = array();
+        $where[] = 'page_rootpid = ' . (int) $rootPid;
         $where[] = DatabaseUtility::conditionIn('uid', $uidList);
-        $where   = DatabaseUtility::buildCondition($where);
+        $where = DatabaseUtility::buildCondition($where);
 
         $query = 'UPDATE tx_metaseo_sitemap
                      SET is_blacklisted = 1
@@ -173,20 +177,22 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
      *
      * @return    boolean
      */
-    protected function executeWhitelist() {
+    protected function executeWhitelist()
+    {
         $uidList = $this->postVar['uidList'];
-        $rootPid = (int)$this->postVar['pid'];
+        $rootPid = (int) $this->postVar['pid'];
 
-        $uidList = DatabaseUtility::connection()->cleanIntArray($uidList);
+        $uidList = DatabaseUtility::connection()
+            ->cleanIntArray($uidList);
 
         if (empty($uidList) || empty($rootPid)) {
             return false;
         }
 
-        $where   = array();
-        $where[] = 'page_rootpid = ' . (int)$rootPid;
+        $where = array();
+        $where[] = 'page_rootpid = ' . (int) $rootPid;
         $where[] = DatabaseUtility::conditionIn('uid', $uidList);
-        $where   = DatabaseUtility::buildCondition($where);
+        $where = DatabaseUtility::buildCondition($where);
 
         $query = 'UPDATE tx_metaseo_sitemap
                      SET is_blacklisted = 0
@@ -202,20 +208,22 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
      *
      * @return    boolean
      */
-    protected function executeDelete() {
+    protected function executeDelete()
+    {
         $uidList = $this->postVar['uidList'];
-        $rootPid = (int)$this->postVar['pid'];
+        $rootPid = (int) $this->postVar['pid'];
 
-        $uidList = DatabaseUtility::connection()->cleanIntArray($uidList);
+        $uidList = DatabaseUtility::connection()
+            ->cleanIntArray($uidList);
 
         if (empty($uidList) || empty($rootPid)) {
             return false;
         }
 
-        $where   = array();
-        $where[] = 'page_rootpid = ' . (int)$rootPid;
+        $where = array();
+        $where[] = 'page_rootpid = ' . (int) $rootPid;
         $where[] = DatabaseUtility::conditionIn('uid', $uidList);
-        $where   = DatabaseUtility::buildCondition($where);
+        $where = DatabaseUtility::buildCondition($where);
 
         $query = 'DELETE FROM tx_metaseo_sitemap
                          WHERE ' . $where;
@@ -229,16 +237,17 @@ class SitemapAjax extends \Metaseo\Metaseo\Backend\Ajax\AbstractAjax {
      *
      * @return    boolean
      */
-    protected function executeDeleteAll() {
-        $rootPid = (int)$this->postVar['pid'];
+    protected function executeDeleteAll()
+    {
+        $rootPid = (int) $this->postVar['pid'];
 
         if (empty($rootPid)) {
             return false;
         }
 
-        $where   = array();
-        $where[] = 'page_rootpid = ' . (int)$rootPid;
-        $where   = DatabaseUtility::buildCondition($where);
+        $where = array();
+        $where[] = 'page_rootpid = ' . (int) $rootPid;
+        $where = DatabaseUtility::buildCondition($where);
 
         $query = 'DELETE FROM tx_metaseo_sitemap
                          WHERE ' . $where;

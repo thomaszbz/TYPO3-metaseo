@@ -29,7 +29,8 @@ namespace Metaseo\Metaseo\Hook\TCA;
 /**
  * TCA Hook: Robots.txt default content
  */
-class RobotsTxtDefault {
+class RobotsTxtDefault
+{
 
     /**
      * TYPO3 Object manager
@@ -59,7 +60,8 @@ class RobotsTxtDefault {
      *
      * @return string
      */
-    public function main($data) {
+    public function main($data)
+    {
         // ############################
         // Init
         // ############################

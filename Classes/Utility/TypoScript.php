@@ -25,7 +25,8 @@
 
 namespace Metaseo\Metaseo\Utility;
 
-class TypoScript implements \Iterator {
+class TypoScript implements \Iterator
+{
     ###########################################################################
     ## Attributes
     ###########################################################################
@@ -64,10 +65,11 @@ class TypoScript implements \Iterator {
     /**
      * Constructor
      *
-     * @param NULL|array  $conf TypoScript node configuration
+     * @param NULL|array $conf TypoScript node configuration
      * @param NULL|string $type TypoScript node type
      */
-    public function __construct($conf = null, $type = null) {
+    public function __construct($conf = null, $type = null)
+    {
         if ($conf !== null) {
             $this->tsData = $conf;
         }
@@ -84,9 +86,46 @@ class TypoScript implements \Iterator {
     /**
      * Rewind iterator position
      */
-    public function rewind() {
+    public function rewind()
+    {
         reset($this->tsData);
         $this->iteratorNextNode(false);
+    }
+
+    /**
+     * Search next iterator node
+     */
+    public function iteratorNextNode()
+    {
+        // INIT
+        $iteratorPosition = null;
+        $this->iteratorPosition = false;
+        $nextNode = false;
+
+        do {
+            if ($nextNode) {
+                next($this->tsData);
+            }
+
+            $currentNode = current($this->tsData);
+
+            if ($currentNode !== false) {
+                // get key
+                $iteratorPosition = key($this->tsData);
+
+                // check if node is subnode or value
+                if (substr($iteratorPosition, -1) == '.') {
+                    // next subnode fond
+                    $this->iteratorPosition = $iteratorPosition;
+                    break;
+                }
+            } else {
+                $iteratorPosition = false;
+                $this->iteratorPosition = false;
+            }
+
+            $nextNode = true;
+        } while ($iteratorPosition !== false);
     }
 
     /**
@@ -94,7 +133,8 @@ class TypoScript implements \Iterator {
      *
      * @return boolean
      */
-    public function valid() {
+    public function valid()
+    {
         return $this->iteratorPosition && array_key_exists($this->iteratorPosition, $this->tsData);
     }
 
@@ -103,7 +143,8 @@ class TypoScript implements \Iterator {
      *
      * @return      string  TypoScript path-node-key
      */
-    public function key() {
+    public function key()
+    {
         return substr($this->iteratorPosition, 0, -1);
     }
 
@@ -112,7 +153,8 @@ class TypoScript implements \Iterator {
      *
      * @return TypoScript
      */
-    public function current() {
+    public function current()
+    {
         $nodePath = substr($this->iteratorPosition, 0, -1);
 
         return $this->getNode($nodePath);
@@ -125,11 +167,12 @@ class TypoScript implements \Iterator {
      *
      * @return      TypoScript       TypoScript subnode-object
      */
-    public function getNode($tsNodePath) {
+    public function getNode($tsNodePath)
+    {
         $ret = null;
 
         // extract TypoScript-path informations
-        $nodeSections  = explode('.', $tsNodePath);
+        $nodeSections = explode('.', $tsNodePath);
         $nodeValueType = end($nodeSections);
         $nodeValueName = end($nodeSections) . '.';
 
@@ -163,20 +206,12 @@ class TypoScript implements \Iterator {
         }
 
         // Clone object and set values
-        $ret                   = clone $this;
-        $ret->tsData           = $tsData;
-        $ret->tsType           = $tsType;
+        $ret = clone $this;
+        $ret->tsData = $tsData;
+        $ret->tsType = $tsType;
         $ret->iteratorPosition = false;
 
         return $ret;
-    }
-
-    /**
-     * Next iterator node
-     */
-    public function next() {
-        next($this->tsData);
-        $this->iteratorNextNode(true);
     }
 
     ###########################################################################
@@ -184,54 +219,29 @@ class TypoScript implements \Iterator {
     ###########################################################################
 
     /**
-     * Search next iterator node
+     * Next iterator node
      */
-    public function iteratorNextNode() {
-        // INIT
-        $iteratorPosition       = null;
-        $this->iteratorPosition = false;
-        $nextNode               = false;
-
-        do {
-            if ($nextNode) {
-                next($this->tsData);
-            }
-
-            $currentNode = current($this->tsData);
-
-            if ($currentNode !== false) {
-                // get key
-                $iteratorPosition = key($this->tsData);
-
-                // check if node is subnode or value
-                if (substr($iteratorPosition, -1) == '.') {
-                    // next subnode fond
-                    $this->iteratorPosition = $iteratorPosition;
-                    break;
-                }
-            } else {
-                $iteratorPosition       = false;
-                $this->iteratorPosition = false;
-            }
-
-            $nextNode = true;
-        } while ($iteratorPosition !== false);
+    public function next()
+    {
+        next($this->tsData);
+        $this->iteratorNextNode(true);
     }
 
     /**
      * Get value from node
      *
-     * @param       string $tsNodePath   TypoScript node-path
-     * @param       mixed  $defaultValue Default value
+     * @param       string $tsNodePath  TypoScript node-path
+     * @param       mixed $defaultValue Default value
      *
      * @return      mixed                                   Node value (or default value)
      */
-    public function getValue($tsNodePath, $defaultValue = null) {
+    public function getValue($tsNodePath, $defaultValue = null)
+    {
         $ret = $defaultValue;
 
         // extract TypoScript-path informations
-        $nodeFound     = true;
-        $nodeSections  = explode('.', $tsNodePath);
+        $nodeFound = true;
+        $nodeSections = explode('.', $tsNodePath);
         $nodeValueName = end($nodeSections);
 
         // remove last node from sections because we already got the node name
@@ -266,7 +276,8 @@ class TypoScript implements \Iterator {
      *
      * @return array
      */
-    public function toArray() {
+    public function toArray()
+    {
         return $this->tsData;
     }
 
@@ -275,7 +286,8 @@ class TypoScript implements \Iterator {
      *
      * @return boolean
      */
-    public function isEmpty() {
+    public function isEmpty()
+    {
         return empty($this->tsData);
     }
 
@@ -285,9 +297,29 @@ class TypoScript implements \Iterator {
      *
      * @return      mixed           Result of cObj
      */
-    public function render() {
-        return $this->getCObj()->cObjGetSingle($this->tsType, $this->tsData);
+    public function render()
+    {
+        return $this->getCObj()
+            ->cObjGetSingle($this->tsType, $this->tsData);
     }
+
+    /**
+     * Return instance of \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     *
+     * @return \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     */
+    protected function getCObj()
+    {
+        if ($this->cObj === null) {
+            $this->cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
+        }
+
+        return $this->cObj;
+    }
+
+    ###########################################################################
+    ## Protected methods
+    ###########################################################################
 
     /**
      * StdWrap with TypoScript Configuration
@@ -296,25 +328,10 @@ class TypoScript implements \Iterator {
      *
      * @return      mixed           Result of stdWrap
      */
-    public function stdWrap($value = null) {
-        return $this->getCObj()->stdWrap($value, $this->tsData);
-    }
-
-    ###########################################################################
-    ## Protected methods
-    ###########################################################################
-
-    /**
-     * Return instance of \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     *
-     * @return \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    protected function getCObj() {
-        if ($this->cObj === null) {
-            $this->cObj = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
-        }
-
-        return $this->cObj;
+    public function stdWrap($value = null)
+    {
+        return $this->getCObj()
+            ->stdWrap($value, $this->tsData);
     }
 
     ###########################################################################
@@ -325,17 +342,22 @@ class TypoScript implements \Iterator {
     ## Accessors
     ###########################################################################
 
-    public function setTypoScript(Array $conf) {
+    public function setTypoScript(Array $conf)
+    {
         $this->tsData = $conf;
+
         return $this;
     }
 
-    public function getTypoScriptType() {
+    public function getTypoScriptType()
+    {
         return $this->tsType;
     }
 
-    public function setTypoScriptType($value) {
-        $this->tsType = (string)$value;
+    public function setTypoScriptType($value)
+    {
+        $this->tsType = (string) $value;
+
         return $this;
     }
 

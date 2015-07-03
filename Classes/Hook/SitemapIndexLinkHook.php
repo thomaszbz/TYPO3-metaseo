@@ -32,7 +32,8 @@ use Metaseo\Metaseo\Utility\SitemapUtility;
 /**
  * Sitemap Indexer
  */
-class SitemapIndexLinkHook extends SitemapIndexHook {
+class SitemapIndexLinkHook extends SitemapIndexHook
+{
 
 
     // ########################################################################
@@ -46,7 +47,8 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
      *
      * @return  void
      */
-    public function hook_linkParse(&$pObj) {
+    public function hook_linkParse(&$pObj)
+    {
 
         if (!$this->checkIfSitemapIndexingIsEnabled('typolink')) {
             return;
@@ -61,7 +63,7 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
 
         // Init link informations
         $linkConf = $pObj['conf'];
-        $linkUrl  = $pObj['finalTagParts']['url'];
+        $linkUrl = $pObj['finalTagParts']['url'];
         list($linkPageUid, $linkType) = $this->parseLinkConf($pObj);
         $linkUrl = $this->processLinkUrl($linkUrl);
 
@@ -123,9 +125,9 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
 
         // Fetch sysLanguage
         if (isset($addParameters['L'])) {
-            $pageLanguage = (int)$addParameters['L'];
+            $pageLanguage = (int) $addParameters['L'];
         } else {
-            $pageLanguage = (int)GeneralUtility::getLanguageId();
+            $pageLanguage = (int) GeneralUtility::getLanguageId();
         }
 
         // Index link
@@ -140,54 +142,15 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
     // ########################################################################
 
     /**
-     * Generate sitemap page data
-     *
-     * @param string  $linkUrl      Link of current url
-     * @param integer $linkPageUid  Link target page id
-     * @param array   $rootline     Rootline of link
-     * @param integer $pageLanguage Language id
-     * @param integer $linkType     Link type
-     *
-     * @return array
-     * @internal param string $pageUrl Page url
-     *
-     */
-    protected function generateSitemapPageData($linkUrl, $linkPageUid, $rootline, $pageLanguage, $linkType) {
-        $tstamp = $_SERVER['REQUEST_TIME'];
-
-        $rootPid = $rootline[0]['uid'];
-
-        // Get page data from rootline
-        $page = reset($rootline);
-
-        $ret = array(
-            'tstamp'                => $tstamp,
-            'crdate'                => $tstamp,
-            'page_rootpid'          => $rootPid,
-            'page_uid'              => $linkPageUid,
-            'page_language'         => $pageLanguage,
-            'page_url'              => $this->getPageUrl($linkUrl),
-            'page_depth'            => count($rootline),
-            'page_change_frequency' => $this->getPageChangeFrequency($page),
-            'page_type'             => $linkType,
-            'expire'                => $this->indexExpiration,
-        );
-
-        // Call hook
-        GeneralUtility::callHookAndSignal(__CLASS__, 'sitemapIndexLink', $this, $ret);
-
-        return $ret;
-    }
-
-    /**
      * Parse uid and type from generated link (from config array)
      *
      * @param  array $conf Generated Link config array
      *
      * @return array
      */
-    protected function parseLinkConf($conf) {
-        $uid  = null;
+    protected function parseLinkConf($conf)
+    {
+        $uid = null;
         $type = null;
 
         // Check link type
@@ -215,7 +178,7 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
                 if ($this->checkIfFileIsWhitelisted($fileUrl)) {
                     // File will be registered from the root page
                     // to prevent duplicate urls
-                    $uid  = GeneralUtility::getRootPid();
+                    $uid = GeneralUtility::getRootPid();
                     $type = SitemapUtility::SITEMAP_TYPE_FILE;
                 }
                 break;
@@ -234,7 +197,8 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
      *
      * @return  boolean
      */
-    protected function checkIfFileIsWhitelisted($url) {
+    protected function checkIfFileIsWhitelisted($url)
+    {
         $ret = false;
 
         // check for valid url
@@ -264,13 +228,55 @@ class SitemapIndexLinkHook extends SitemapIndexHook {
     }
 
     /**
+     * Generate sitemap page data
+     *
+     * @param string $linkUrl       Link of current url
+     * @param integer $linkPageUid  Link target page id
+     * @param array $rootline       Rootline of link
+     * @param integer $pageLanguage Language id
+     * @param integer $linkType     Link type
+     *
+     * @return array
+     * @internal param string $pageUrl Page url
+     *
+     */
+    protected function generateSitemapPageData($linkUrl, $linkPageUid, $rootline, $pageLanguage, $linkType)
+    {
+        $tstamp = $_SERVER['REQUEST_TIME'];
+
+        $rootPid = $rootline[0]['uid'];
+
+        // Get page data from rootline
+        $page = reset($rootline);
+
+        $ret = array(
+            'tstamp' => $tstamp,
+            'crdate' => $tstamp,
+            'page_rootpid' => $rootPid,
+            'page_uid' => $linkPageUid,
+            'page_language' => $pageLanguage,
+            'page_url' => $this->getPageUrl($linkUrl),
+            'page_depth' => count($rootline),
+            'page_change_frequency' => $this->getPageChangeFrequency($page),
+            'page_type' => $linkType,
+            'expire' => $this->indexExpiration,
+        );
+
+        // Call hook
+        GeneralUtility::callHookAndSignal(__CLASS__, 'sitemapIndexLink', $this, $ret);
+
+        return $ret;
+    }
+
+    /**
      * Get current page url
      *
      * @param string $linkUrl Link url
      *
      * @return null|string
      */
-    protected function getPageUrl($linkUrl) {
+    protected function getPageUrl($linkUrl)
+    {
         $linkParts = parse_url($linkUrl);
 
         // Remove left / (but only if not root page)

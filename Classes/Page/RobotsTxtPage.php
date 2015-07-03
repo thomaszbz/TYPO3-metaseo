@@ -31,7 +31,8 @@ use Metaseo\Metaseo\Utility\GeneralUtility;
 /**
  * Robots txt Page
  */
-class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
+class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage
+{
 
     // ########################################################################
     // Attributes
@@ -64,10 +65,10 @@ class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
      * @var integer
      */
     protected $languageId;
-    
+
     /**
      * Link to static sitemap
-     * 
+     *
      * @var boolean
      */
     protected $linkToStaticSitemap;
@@ -86,14 +87,15 @@ class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
     /**
      * Fetch and build robots.txt
      */
-    public function main() {
+    public function main()
+    {
         $ret = '';
 
         $settings = GeneralUtility::getRootSetting();
 
         // INIT
         $this->tsSetup = $GLOBALS['TSFE']->tmpl->setup;
-        $this->cObj    = $GLOBALS['TSFE']->cObj;
+        $this->cObj = $GLOBALS['TSFE']->cObj;
         $this->rootPid = GeneralUtility::getRootPid();
 
         $this->tsSetupSeo = null;
@@ -110,7 +112,7 @@ class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
 
         // Language lock
         $this->sitemapLanguageLock = GeneralUtility::getRootSettingValue('is_sitemap_language_lock', false);
-        $this->languageId          = GeneralUtility::getLanguageId();
+        $this->languageId = GeneralUtility::getLanguageId();
 
         // ###############################
         // Fetch robots.txt content
@@ -158,15 +160,16 @@ class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
 
     /**
      * Apply marker to robots.txt
-     * 
+     *
      * @param string $robotsTxt Content of robots.txt
      *
      * @return string
      */
-    protected function applyMarker($robotsTxt) {
+    protected function applyMarker($robotsTxt)
+    {
         $ret = $robotsTxt;
-        
-        $markerList     = array();
+
+        $markerList = array();
         $markerConfList = array();
 
         foreach ($this->tsSetupSeo['marker.'] as $name => $data) {
@@ -189,9 +192,9 @@ class RobotsTxtPage extends \Metaseo\Metaseo\Page\AbstractPage {
         // generate sitemap-static marker
         if ($this->linkToStaticSitemap) {
             if ($this->sitemapLanguageLock) {
-                $path = 'uploads/tx_metaseo/sitemap_xml/index-r' . (int)$this->rootPid . '-l' . (int)$this->languageId . '.xml.gz';
+                $path = 'uploads/tx_metaseo/sitemap_xml/index-r' . (int) $this->rootPid . '-l' . (int) $this->languageId . '.xml.gz';
             } else {
-                $path = 'uploads/tx_metaseo/sitemap_xml/index-r' . (int)$this->rootPid . '.xml.gz';
+                $path = 'uploads/tx_metaseo/sitemap_xml/index-r' . (int) $this->rootPid . '.xml.gz';
             }
 
             $conf = array(
