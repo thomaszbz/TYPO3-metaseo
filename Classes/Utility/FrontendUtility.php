@@ -90,14 +90,14 @@ class FrontendUtility
         if ($lastTsSetupPid !== $pageUid) {
             // Cache TSFE if possible to prevent reinit (is still slow but we need the TSFE)
             if (empty($cacheTSFE[$pageUid])) {
-                /** @var \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController $tsfeController */
-                $tsfeController                   = $objectManager->get(
+                /** @var \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController $tsfe */
+                $tsfe = $objectManager->get(
                     'TYPO3\\CMS\\Frontend\\Controller\\TypoScriptFrontendController',
                     $GLOBALS['TYPO3_CONF_VARS'],
                     $pageUid,
                     0
                 );
-                $tsfeController->sys_language_uid = $sysLanguage;
+                $tsfe->sys_language_uid = $sysLanguage;
 
                 /** @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $cObjRenderer */
                 $cObjRenderer = $objectManager->get('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
@@ -113,32 +113,33 @@ class FrontendUtility
                 $_GET['id'] = $pageUid;
 
                 // Init TSFE
-                $GLOBALS['TSFE']       = $tsfeController;
-                $GLOBALS['TSFE']->cObj = $cObjRenderer;
-                $GLOBALS['TSFE']->initFEuser();
-                $GLOBALS['TSFE']->determineId();
+                GlobalUtility::setTypoScriptFrontendController($tsfe);
+                $tsfe->cObj = $cObjRenderer;
+                $tsfe->initFEuser();
+                $tsfe->determineId();
 
-                if (empty($GLOBALS['TSFE']->tmpl)) {
-                    $GLOBALS['TSFE']->tmpl = new \stdClass();
+                if (empty($tsfe->tmpl)) {
+                    $tsfe->tmpl = new \stdClass();
                 }
 
-                $GLOBALS['TSFE']->tmpl->setup = $TSObj->setup;
-                $GLOBALS['TSFE']->initTemplate();
-                $GLOBALS['TSFE']->getConfigArray();
+                $tsfe->tmpl->setup = $TSObj->setup;
+                $tsfe->initTemplate();
+                $tsfe->getConfigArray();
 
-                $GLOBALS['TSFE']->baseUrl = $GLOBALS['TSFE']->config['config']['baseURL'];
+                $tsfe->baseUrl = $tsfe->config['config']['baseURL'];
 
-                $cacheTSFE[$pageUid] = $GLOBALS['TSFE'];
+                $cacheTSFE[$pageUid] = $tsfe;
             }
 
-            $GLOBALS['TSFE'] = $cacheTSFE[$pageUid];
+            GlobalUtility::setTypoScriptFrontendController($cacheTSFE[$pageUid]);
+
 
             $lastTsSetupPid = $pageUid;
         }
-
-        $GLOBALS['TSFE']->page       = $pageData;
-        $GLOBALS['TSFE']->rootLine   = $rootlineFull;
-        $GLOBALS['TSFE']->cObj->data = $pageData;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        $tsfe->page       = $pageData;
+        $tsfe->rootLine   = $rootlineFull;
+        $tsfe->cObj->data = $pageData;
     }
 
     /**
@@ -160,19 +161,19 @@ class FrontendUtility
      */
     public static function isCacheable()
     {
-        $TSFE = self::getTsfe();
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
-        if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !empty($TSFE->fe_user->user['uid'])) {
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET' || !empty($tsfe->fe_user->user['uid'])) {
             return false;
         }
 
         // don't parse if page is not cacheable
-        if (!$TSFE->isStaticCacheble()) {
+        if (!$tsfe->isStaticCacheble()) {
             return false;
         }
 
         // Skip no_cache-pages
-        if (!empty($TSFE->no_cache)) {
+        if (!empty($tsfe->no_cache)) {
             return false;
         }
 
@@ -188,24 +189,14 @@ class FrontendUtility
     {
         $ret = null;
 
-        $TSFE = self::getTsfe();
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
-        if (!empty($TSFE->anchorPrefix)) {
-            $ret = (string)$TSFE->anchorPrefix;
+        if (!empty($tsfe->anchorPrefix)) {
+            $ret = (string)$tsfe->anchorPrefix;
         } else {
-            $ret = (string)$TSFE->siteScript;
+            $ret = (string)$tsfe->siteScript;
         }
 
         return $ret;
-    }
-
-    /**
-     * Get TSFE
-     *
-     * @return \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController
-     */
-    public static function getTsfe()
-    {
-        return $GLOBALS['TSFE'];
     }
 }

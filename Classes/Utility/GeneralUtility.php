@@ -62,13 +62,14 @@ class GeneralUtility
      */
     public static function getLanguageId()
     {
-        $ret = 0;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
-        if (!empty($GLOBALS['TSFE']->tmpl->setup['config.']['sys_language_uid'])) {
-            $ret = (int)$GLOBALS['TSFE']->tmpl->setup['config.']['sys_language_uid'];
+        if (!empty($tsfe->tmpl->setup['config.']['sys_language_uid'])) {
+
+            return (int)$tsfe->tmpl->setup['config.']['sys_language_uid'];
         }
 
-        return $ret;
+        return 0;
     }
 
     /**
@@ -78,7 +79,7 @@ class GeneralUtility
      */
     public static function getCurrentPid()
     {
-        return $GLOBALS['TSFE']->id;
+        return GlobalUtility::getTypoScriptFrontendController()->id;
     }
 
     /**
@@ -121,7 +122,7 @@ class GeneralUtility
             #################
             if (empty(self::$rootlineCache['__CURRENT__'])) {
                 // Current rootline
-                $rootline = $GLOBALS['TSFE']->tmpl->rootLine;
+                $rootline = GlobalUtility::getTypoScriptFrontendController()->tmpl->rootLine;
 
                 // Filter rootline by siteroot
                 $rootline = self::filterRootlineBySiteroot((array)$rootline);

@@ -28,11 +28,12 @@ namespace Metaseo\Metaseo\Controller;
 
 use Metaseo\Metaseo\Backend\Module\AbstractStandardModule;
 use Metaseo\Metaseo\Utility\DatabaseUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\Utility\IconUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
  * TYPO3 Backend module page seo
@@ -60,7 +61,7 @@ class BackendPageSeoController extends AbstractStandardModule
      */
     protected function handleSubAction($listType)
     {
-        $pageId = (int) GeneralUtility::_GP('id');
+        $pageId = (int) Typo3GeneralUtility::_GP('id');
 
         if (empty($pageId)) {
             $this->addFlashMessage(
@@ -134,7 +135,8 @@ class BackendPageSeoController extends AbstractStandardModule
             );
         }
 
-        $sysLanguageDefault = (int)$GLOBALS['BE_USER']->getSessionData('MetaSEO.sysLanguage');
+        $sysLanguageDefault = (int)GlobalUtility::getBackendUserAuthentication()
+            ->getSessionData('MetaSEO.sysLanguage');
 
         if (empty($sysLanguageDefault)) {
             $sysLanguageDefault = 0;

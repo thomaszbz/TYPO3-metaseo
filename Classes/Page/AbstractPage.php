@@ -26,7 +26,8 @@
 
 namespace Metaseo\Metaseo\Page;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
  * Abstract page
@@ -60,7 +61,7 @@ abstract class AbstractPage
     public function __construct()
     {
         // Init object manager
-        $this->objectManager = GeneralUtility::makeInstance(
+        $this->objectManager = Typo3GeneralUtility::makeInstance(
             'TYPO3\\CMS\\Extbase\\Object\\ObjectManager'
         );
     }
@@ -84,7 +85,7 @@ abstract class AbstractPage
         }
 
         header('HTTP/1.0 503 Service Unavailable');
-        $GLOBALS['TSFE']->pageErrorHandler(true, null, $msg);
+        GlobalUtility::getTypoScriptFrontendController()->pageErrorHandler(true, null, $msg);
         exit;
     }
 }

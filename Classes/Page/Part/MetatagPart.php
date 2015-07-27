@@ -29,6 +29,7 @@ namespace Metaseo\Metaseo\Page\Part;
 use Metaseo\Metaseo\Utility\DatabaseUtility;
 use Metaseo\Metaseo\Utility\FrontendUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
@@ -98,9 +99,10 @@ class MetatagPart extends AbstractPart
      */
     protected function initialize()
     {
-        $this->cObj       = $GLOBALS['TSFE']->cObj;
-        $this->tsSetup    = $GLOBALS['TSFE']->tmpl->setup;
-        $this->pageRecord = $GLOBALS['TSFE']->page;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        $this->cObj       = $tsfe->cObj;
+        $this->tsSetup    = $tsfe->tmpl->setup;
+        $this->pageRecord = $tsfe->page;
         $this->pageMeta   = array();
 
         $this->metaTagList = array();
@@ -254,35 +256,36 @@ class MetatagPart extends AbstractPart
      */
     protected function initExtensionSupportNews()
     {
-        if (empty($GLOBALS['TSFE']->register)) {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        if (empty($tsfe->register)) {
             return;
         }
 
         /** @var \Metaseo\Metaseo\Connector $connector */
         $connector = $this->objectManager->get('Metaseo\\Metaseo\\Connector');
 
-        if (isset($GLOBALS['TSFE']->register['newsTitle'])) {
-            $connector->setMetaTag('title', $GLOBALS['TSFE']->register['newsTitle']);
+        if (isset($tsfe->register['newsTitle'])) {
+            $connector->setMetaTag('title', $tsfe->register['newsTitle']);
         }
 
-        if (isset($GLOBALS['TSFE']->register['newsAuthor'])) {
-            $connector->setMetaTag('author', $GLOBALS['TSFE']->register['newsAuthor']);
+        if (isset($tsfe->register['newsAuthor'])) {
+            $connector->setMetaTag('author', $tsfe->register['newsAuthor']);
         }
 
-        if (isset($GLOBALS['TSFE']->register['newsAuthoremail'])) {
-            $connector->setMetaTag('email', $GLOBALS['TSFE']->register['newsAuthoremail']);
+        if (isset($tsfe->register['newsAuthoremail'])) {
+            $connector->setMetaTag('email', $tsfe->register['newsAuthoremail']);
         }
 
-        if (isset($GLOBALS['TSFE']->register['newsAuthorEmail'])) {
-            $connector->setMetaTag('email', $GLOBALS['TSFE']->register['newsAuthorEmail']);
+        if (isset($tsfe->register['newsAuthorEmail'])) {
+            $connector->setMetaTag('email', $tsfe->register['newsAuthorEmail']);
         }
 
-        if (isset($GLOBALS['TSFE']->register['newsKeywords'])) {
-            $connector->setMetaTag('keywords', $GLOBALS['TSFE']->register['newsKeywords']);
+        if (isset($tsfe->register['newsKeywords'])) {
+            $connector->setMetaTag('keywords', $tsfe->register['newsKeywords']);
         }
 
-        if (isset($GLOBALS['TSFE']->register['newsTeaser'])) {
-            $connector->setMetaTag('description', $GLOBALS['TSFE']->register['newsTeaser']);
+        if (isset($tsfe->register['newsTeaser'])) {
+            $connector->setMetaTag('description', $tsfe->register['newsTeaser']);
         }
     }
 
@@ -312,7 +315,7 @@ class MetatagPart extends AbstractPart
      */
     protected function isHtml5()
     {
-        return ($GLOBALS['TSFE']->config['config']['doctype'] === 'html5');
+        return (GlobalUtility::getTypoScriptFrontendController()->config['config']['doctype'] === 'html5');
     }
 
     /**
@@ -322,19 +325,19 @@ class MetatagPart extends AbstractPart
      */
     protected function isXhtml()
     {
-        $ret = false;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
-        if (strpos($GLOBALS['TSFE']->config['config']['doctype'], 'xhtml') !== false) {
+        if (strpos($tsfe->config['config']['doctype'], 'xhtml') !== false) {
             // doctype xhtml
-            $ret = true;
+            return true;
         }
 
-        if (strpos($GLOBALS['TSFE']->config['config']['xhtmlDoctype'], 'xhtml') !== false) {
+        if (strpos($tsfe->config['config']['xhtmlDoctype'], 'xhtml') !== false) {
             // doctype xhtml doctype
-            $ret = true;
+            return true;
         }
 
-        return $ret;
+        return false;
     }
 
 
@@ -349,14 +352,15 @@ class MetatagPart extends AbstractPart
      */
     protected function generateLink($url, $conf = null, $disableMP = false)
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         if ($conf === null) {
             $conf = array();
         }
 
-        $mpOldConfValue = $GLOBALS['TSFE']->config['config']['MP_disableTypolinkClosestMPvalue'];
+        $mpOldConfValue = $tsfe->config['config']['MP_disableTypolinkClosestMPvalue'];
         if ($disableMP === true) {
             // Disable MP usage in typolink - link to the real page instead
-            $GLOBALS['TSFE']->config['config']['MP_disableTypolinkClosestMPvalue'] = 1;
+            $tsfe->config['config']['MP_disableTypolinkClosestMPvalue'] = 1;
         }
 
         $conf['parameter'] = $url;
@@ -367,7 +371,7 @@ class MetatagPart extends AbstractPart
 
         if ($disableMP === true) {
             // Restore old MP linking configuration
-            $GLOBALS['TSFE']->config['config']['MP_disableTypolinkClosestMPvalue'] = $mpOldConfValue;
+            $tsfe->config['config']['MP_disableTypolinkClosestMPvalue'] = $mpOldConfValue;
         }
 
         return $ret;
@@ -382,6 +386,7 @@ class MetatagPart extends AbstractPart
      */
     protected function detectCanonicalPage($tsConfig = array())
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         #####################
         # Fetch typoscript config
         #####################
@@ -400,8 +405,8 @@ class MetatagPart extends AbstractPart
 
         // Fetch chash
         $pageHash = null;
-        if (!empty($GLOBALS['TSFE']->cHash)) {
-            $pageHash = $GLOBALS['TSFE']->cHash;
+        if (!empty($tsfe->cHash)) {
+            $pageHash = $tsfe->cHash;
         }
 
         #####################
@@ -411,7 +416,7 @@ class MetatagPart extends AbstractPart
             if ($strictMode) {
                 if ($noMpMode && GeneralUtility::isMountpointInRootLine()) {
                     // Mountpoint detected
-                    $linkParam = $GLOBALS['TSFE']->id;
+                    $linkParam = $tsfe->id;
 
                     // Force removing of MP param
                     $linkConf['addQueryString'] = 1;
@@ -425,7 +430,7 @@ class MetatagPart extends AbstractPart
                     $linkMpMode = true;
                 } else {
                     // force canonical-url to page url (without any parameters)
-                    $linkParam = $GLOBALS['TSFE']->id;
+                    $linkParam = $tsfe->id;
                 }
             } else {
                 // Blacklisted and no strict mode, we don't output canonical tag
@@ -437,10 +442,10 @@ class MetatagPart extends AbstractPart
         # No cached pages
         #####################
 
-        if (!empty($GLOBALS['TSFE']->no_cache)) {
+        if (!empty($tsfe->no_cache)) {
             if ($strictMode) {
                 // force canonical-url to page url (without any parameters)
-                $linkParam = $GLOBALS['TSFE']->id;
+                $linkParam = $tsfe->id;
             }
         }
 
@@ -458,7 +463,7 @@ class MetatagPart extends AbstractPart
 
         if (!$linkParam && $noMpMode && GeneralUtility::isMountpointInRootLine()) {
             // Mountpoint detected
-            $linkParam = $GLOBALS['TSFE']->id;
+            $linkParam = $tsfe->id;
 
             // Force removing of MP param
             $linkConf['addQueryString'] = 1;
@@ -482,7 +487,7 @@ class MetatagPart extends AbstractPart
                 // Virtual plugin page, we have to use anchor or site script
                 $linkParam = FrontendUtility::getCurrentUrl();
             } else {
-                $linkParam = $GLOBALS['TSFE']->id;
+                $linkParam = $tsfe->id;
             }
         }
 
@@ -491,7 +496,7 @@ class MetatagPart extends AbstractPart
         #####################
 
         if ($strictMode && empty($linkParam)) {
-            $linkParam = $GLOBALS['TSFE']->id;
+            $linkParam = $tsfe->id;
         }
 
         return array($linkParam, $linkConf, $linkMpMode);
@@ -1210,6 +1215,7 @@ class MetatagPart extends AbstractPart
      */
     protected function generateLinkMetaTags()
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         $rootLine = GeneralUtility::getRootLine();
 
         $currentPage = end($rootLine);
@@ -1227,13 +1233,13 @@ class MetatagPart extends AbstractPart
         // to prevent linking to other domains
         // see https://github.com/mblaschke/TYPO3-metaseo/issues/5
         if (!$currentIsRootpage) {
-            $prevPage    = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['prev.']);
+            $prevPage    = $tsfe->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['prev.']);
             $prevPageUrl = null;
             if (!empty($prevPage)) {
                 $prevPageUrl = $this->generateLink($prevPage);
             }
 
-            $nextPage    = $GLOBALS['TSFE']->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['next.']);
+            $nextPage    = $tsfe->cObj->HMENU($this->tsSetupSeo['sectionLinks.']['next.']);
             $nextPageUrl = null;
             if (!empty($nextPage)) {
                 $nextPageUrl = $this->generateLink($nextPage);

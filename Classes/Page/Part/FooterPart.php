@@ -26,8 +26,9 @@
 
 namespace Metaseo\Metaseo\Page\Part;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
  * Page Footer
@@ -52,10 +53,10 @@ class FooterPart extends AbstractPart
     {
         // INIT
         $ret        = array();
-        $tsSetup    = $GLOBALS['TSFE']->tmpl->setup;
+        $tsSetup    = GlobalUtility::getTypoScriptFrontendController()->tmpl->setup;
         $tsServices = array();
 
-        $beLoggedIn = isset($GLOBALS['BE_USER']->user['username']);
+        $beLoggedIn = isset(GlobalUtility::getBackendUserAuthentication()->user['username']);
 
         $disabledHeaderCode = false;
         if (!empty($tsSetup['config.']['disableAllHeaderCode'])) {
@@ -91,14 +92,14 @@ class FooterPart extends AbstractPart
                 }
             } elseif ($gaEnabled && $beLoggedIn) {
                 // Disable caching
-                $GLOBALS['TSFE']->set_no_cache('MetaSEO: Google Analytics code disabled, backend login detected');
+                GlobalUtility::getTypoScriptFrontendController()
+                    ->set_no_cache('MetaSEO: Google Analytics code disabled, backend login detected');
 
                 // Backend login detected, disable cache because this page is viewed by BE-users
                 $ret['ga.disabled'] = '<!-- Google Analytics disabled, '
                     . 'Page cache disabled - Backend-Login detected -->';
             }
         }
-
 
         // #########################################
         // PIWIK
@@ -120,7 +121,8 @@ class FooterPart extends AbstractPart
                 $ret['piwik'] = $this->buildPiwikCode($tsServices, $piwikConf);
             } elseif ($piwikEnabled && $beLoggedIn) {
                 // Disable caching
-                $GLOBALS['TSFE']->set_no_cache('MetaSEO: Piwik code disabled, backend login detected');
+                GlobalUtility::getTypoScriptFrontendController()
+                    ->set_no_cache('MetaSEO: Piwik code disabled, backend login detected');
 
                 // Backend login detected, disable cache because this page is viewed by BE-users
                 $ret['piwik.disabled'] = '<!-- Piwik disabled, Page cache disabled - Backend-Login detected -->';

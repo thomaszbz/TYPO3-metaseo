@@ -26,6 +26,7 @@
 
 namespace Metaseo\Metaseo\Hook\TCA;
 
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
 
@@ -101,7 +102,7 @@ class RobotsTxtDefault
             0
         );
 
-        $GLOBALS['TSFE'] = $tsfeController;
+        GlobalUtility::setTypoScriptFrontendController($tsfeController);
 
         // ############################
         // Render default robots.txt content

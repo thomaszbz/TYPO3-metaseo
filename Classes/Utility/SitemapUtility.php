@@ -212,17 +212,18 @@ class SitemapUtility
     public static function getPageTypeBlacklist()
     {
         $ret = self::$pagetypeBlacklist;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
         // Fetch from SetupTS (comma separated list)
-        if (isset($GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist'])
+        if (isset($tsfe->tmpl->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist'])
             && strlen(
-                $GLOBALS['TSFE']
+                $tsfe
                     ->tmpl
                     ->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist']
             ) >= 1
         ) {
-            $pageTypeBlacklist = $GLOBALS['TSFE']->tmpl
-                                     ->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist'];
+            $pageTypeBlacklist = $tsfe->tmpl
+                                      ->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist'];
             $pageTypeBlacklist = GeneralUtility::trimExplode(',', $pageTypeBlacklist);
 
             $ret = array_merge($ret, $pageTypeBlacklist);

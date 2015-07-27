@@ -28,6 +28,7 @@ namespace Metaseo\Metaseo\Page\Part;
 
 use Metaseo\Metaseo\Utility\FrontendUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
@@ -80,6 +81,7 @@ class PagetitlePart extends AbstractPart
      */
     public function main($title)
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         $ret = null;
 
         // ############################
@@ -90,7 +92,7 @@ class PagetitlePart extends AbstractPart
         if ($pageTitleCachingEnabled === true) {
             $cacheIdentification = sprintf(
                 '%s_%s_title',
-                $GLOBALS['TSFE']->id,
+                $tsfe->id,
                 substr(sha1(FrontendUtility::getCurrentUrl()), 10, 30)
             );
 
@@ -119,7 +121,7 @@ class PagetitlePart extends AbstractPart
 
             // Cache page title (if page is not cacheable)
             if ($pageTitleCachingEnabled === true && isset($cache) && isset($cacheIdentification)) {
-                $cache->set($cacheIdentification, $ret, array('pageId_' . $GLOBALS['TSFE']->id));
+                $cache->set($cacheIdentification, $ret, array('pageId_' . $tsfe->id));
             }
         }
 
@@ -138,8 +140,9 @@ class PagetitlePart extends AbstractPart
      */
     protected function initialize()
     {
-        $this->cObj       = $GLOBALS['TSFE']->cObj;
-        $this->tsSetup    = $GLOBALS['TSFE']->tmpl->setup;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        $this->cObj       = $tsfe->cObj;
+        $this->tsSetup    = $tsfe->tmpl->setup;
         $this->rootLine   = GeneralUtility::getRootLine();
 
         if (!empty($this->tsSetup['plugin.']['metaseo.'])) {
@@ -161,7 +164,9 @@ class PagetitlePart extends AbstractPart
      */
     protected function checkIfPageTitleCachingEnabled()
     {
-        $cachingEnabled = !empty($GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.']['pageTitle.']['caching']);
+        $cachingEnabled = !empty(GlobalUtility::getTypoScriptFrontendController()
+            ->tmpl->setup['plugin.']['metaseo.']['pageTitle.']['caching']
+        );
 
         // Enable caching only if caching is enabled in SetupTS
         // And if there is any USER_INT on the current page
@@ -186,11 +191,11 @@ class PagetitlePart extends AbstractPart
      */
     public function generatePageTitle($title)
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         // INIT
         $ret              = $title;
-        $rawTitle         = !empty($GLOBALS['TSFE']->altPageTitle) ?
-            $GLOBALS['TSFE']->altPageTitle : $GLOBALS['TSFE']->page['title'];
-        $currentPid       = $GLOBALS['TSFE']->id;
+        $rawTitle         = !empty($tsfe->altPageTitle) ? $tsfe->altPageTitle : $tsfe->page['title'];
+        $currentPid       = $tsfe->id;
         $skipPrefixSuffix = false;
         $applySitetitle   = true;
 
@@ -202,8 +207,8 @@ class PagetitlePart extends AbstractPart
         $sitetitle = $this->tsSetup['sitetitle'];
 
         // Use browsertitle if available
-        if (!empty($GLOBALS['TSFE']->page['tx_metaseo_pagetitle_rel'])) {
-            $rawTitle = $GLOBALS['TSFE']->page['tx_metaseo_pagetitle_rel'];
+        if (!empty($tsfe->page['tx_metaseo_pagetitle_rel'])) {
+            $rawTitle = $tsfe->page['tx_metaseo_pagetitle_rel'];
         }
 
         // Call hook
@@ -227,8 +232,8 @@ class PagetitlePart extends AbstractPart
         // #######################################################################
         // RAW PAGE TITLE
         // #######################################################################
-        if (!empty($GLOBALS['TSFE']->page['tx_metaseo_pagetitle'])) {
-            $ret = $GLOBALS['TSFE']->page['tx_metaseo_pagetitle'];
+        if (!empty($tsfe->page['tx_metaseo_pagetitle'])) {
+            $ret = $tsfe->page['tx_metaseo_pagetitle'];
 
             // Add template prefix/suffix
             if (empty($this->tsSetupSeo['pageTitle.']['applySitetitleToPagetitle'])) {

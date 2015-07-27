@@ -28,8 +28,10 @@ namespace Metaseo\Metaseo\Hook;
 
 use Metaseo\Metaseo\Utility\FrontendUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use Metaseo\Metaseo\Utility\SitemapUtility;
 use TYPO3\CMS\Core\SingletonInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
  * Sitemap Indexer
@@ -109,7 +111,7 @@ abstract class SitemapIndexHook implements SingletonInterface
     public function __construct()
     {
         /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-        $this->objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(
+        $this->objectManager = Typo3GeneralUtility::makeInstance(
             'TYPO3\\CMS\\Extbase\\Object\\ObjectManager'
         );
 
@@ -121,9 +123,10 @@ abstract class SitemapIndexHook implements SingletonInterface
      */
     protected function initConfiguration()
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         // Get configuration
-        if (!empty($GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.'])) {
-            $this->conf = $GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.'];
+        if (!empty($tsfe->tmpl->setup['plugin.']['metaseo.'])) {
+            $this->conf = $tsfe->tmpl->setup['plugin.']['metaseo.'];
         }
 
         // Store blacklist configuration
@@ -135,7 +138,7 @@ abstract class SitemapIndexHook implements SingletonInterface
         if (!empty($this->conf['sitemap.']['index.']['fileExtension.'])) {
             # File extensions can be a comma separated list
             foreach ($this->conf['sitemap.']['index.']['fileExtension.'] as $fileExtListRaw) {
-                $fileExtList       = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(',', $fileExtListRaw);
+                $fileExtList       = Typo3GeneralUtility::trimExplode(',', $fileExtListRaw);
                 $this->fileExtList = array_merge($this->fileExtList, $fileExtList);
             };
         }
@@ -170,8 +173,9 @@ abstract class SitemapIndexHook implements SingletonInterface
 
         // Fetch abs ref prefix if available/set
         if ($absRefPrefix === null) {
-            if (!empty($GLOBALS['TSFE']->tmpl->setup['config.']['absRefPrefix'])) {
-                $absRefPrefix       = $GLOBALS['TSFE']->tmpl->setup['config.']['absRefPrefix'];
+            $tsfe = GlobalUtility::getTypoScriptFrontendController();
+            if (!empty($tsfe->tmpl->setup['config.']['absRefPrefix'])) {
+                $absRefPrefix       = $tsfe->tmpl->setup['config.']['absRefPrefix'];
                 $absRefPrefixLength = strlen($absRefPrefix);
             } else {
                 $absRefPrefix = false;
@@ -250,6 +254,7 @@ abstract class SitemapIndexHook implements SingletonInterface
      */
     protected function checkIfCurrentPageIsIndexable()
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         // check caching status
         if ($this->pageIndexFlag !== null) {
             return $this->pageIndexFlag;
@@ -267,12 +272,12 @@ abstract class SitemapIndexHook implements SingletonInterface
         }
 
         // Check for type blacklisting (from typoscript PAGE object)
-        if (in_array($GLOBALS['TSFE']->type, $this->pageTypeBlacklist)) {
+        if (in_array($tsfe->type, $this->pageTypeBlacklist)) {
             return false;
         }
 
         // Check for doktype blacklisting (from current page record)
-        if (in_array((int)$GLOBALS['TSFE']->page['doktype'], $this->doktypeBlacklist)) {
+        if (in_array((int)$tsfe->page['doktype'], $this->doktypeBlacklist)) {
             return false;
         }
 

@@ -26,6 +26,7 @@
 
 namespace Metaseo\Metaseo;
 
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\SingletonInterface;
 
 /**
@@ -66,9 +67,10 @@ class Connector implements SingletonInterface
     {
         $value = (string)$value;
 
-        if ($updateTsfe && !empty($GLOBAL['TSFE'])) {
-            $GLOBAL['TSFE']->page['title']   = $value;
-            $GLOBAL['TSFE']->indexedDocTitle = $value;
+        if ($updateTsfe === true) {
+            $tsfe = GlobalUtility::getTypoScriptFrontendController();
+            $tsfe->page['title']   = $value;
+            $tsfe->indexedDocTitle = $value;
         }
 
         self::$store['pagetitle']['pagetitle.title'] = $value;
@@ -102,9 +104,10 @@ class Connector implements SingletonInterface
      */
     public static function setPageTitleAbsolute($value, $updateTsfe = true)
     {
-        if ($updateTsfe && !empty($GLOBALS['TSFE'])) {
-            $GLOBALS['TSFE']->page['title']   = $value;
-            $GLOBALS['TSFE']->indexedDocTitle = $value;
+        if ($updateTsfe === true) {
+            $tsfe = GlobalUtility::getTypoScriptFrontendController();
+            $tsfe->page['title']   = $value;
+            $tsfe->indexedDocTitle = $value;
         }
 
         self::$store['pagetitle']['pagetitle.absolute'] = $value;

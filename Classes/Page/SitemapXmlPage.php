@@ -27,6 +27,7 @@
 namespace Metaseo\Metaseo\Page;
 
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
@@ -52,7 +53,8 @@ class SitemapXmlPage extends AbstractPage
     public function main()
     {
         // INIT
-        $this->tsSetup = $GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.']['sitemap.'];
+        $this->tsSetup = GlobalUtility::getTypoScriptFrontendController()
+                             ->tmpl->setup['plugin.']['metaseo.']['sitemap.'];
 
         // check if sitemap is enabled in root
         if (!GeneralUtility::getRootSettingValue('is_sitemap', true)) {

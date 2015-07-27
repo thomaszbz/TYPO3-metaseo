@@ -27,6 +27,7 @@
 namespace Metaseo\Metaseo\Sitemap\Generator;
 
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use Metaseo\Metaseo\Utility\SitemapUtility;
 
 /**
@@ -106,7 +107,8 @@ abstract class AbstractGenerator
         $this->rootPid = GeneralUtility::getRootPid();
         $sysLanguageId = null;
 
-        $this->tsSetup = $GLOBALS['TSFE']->tmpl->setup['plugin.']['metaseo.']['sitemap.'];
+        $this->tsSetup = GlobalUtility::getTypoScriptFrontendController()
+                             ->tmpl->setup['plugin.']['metaseo.']['sitemap.'];
 
         // Language limit via setupTS
         if (GeneralUtility::getRootSettingValue('is_sitemap_language_lock', false)) {

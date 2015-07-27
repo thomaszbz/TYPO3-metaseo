@@ -27,6 +27,7 @@
 namespace Metaseo\Metaseo\Scheduler\Task;
 
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 
 /**
@@ -124,18 +125,19 @@ abstract class AbstractSitemapTask extends AbstractTask
     protected function generateSitemapLinkTemplate($template)
     {
         $ret = null;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
 
         // Set link template for index file
         $linkConf = array(
             'parameter' => $this->sitemapDir . '/' . $template,
         );
 
-        if (strlen($GLOBALS['TSFE']->baseUrl) > 1) {
-            $ret = $GLOBALS['TSFE']->baseUrlWrap($GLOBALS['TSFE']->cObj->typoLink_URL($linkConf));
-        } elseif (strlen($GLOBALS['TSFE']->absRefPrefix) > 1) {
-            $ret = $GLOBALS['TSFE']->absRefPrefix . $GLOBALS['TSFE']->cObj->typoLink_URL($linkConf);
+        if (strlen($tsfe->baseUrl) > 1) {
+            $ret = $tsfe->baseUrlWrap($tsfe->cObj->typoLink_URL($linkConf));
+        } elseif (strlen($tsfe->absRefPrefix) > 1) {
+            $ret = $tsfe->absRefPrefix . $tsfe->cObj->typoLink_URL($linkConf);
         } else {
-            $ret = $GLOBALS['TSFE']->cObj->typoLink_URL($linkConf);
+            $ret = $tsfe->cObj->typoLink_URL($linkConf);
         }
 
         return $ret;

@@ -29,6 +29,7 @@ namespace Metaseo\Metaseo\Controller;
 use Metaseo\Metaseo\Backend\Module\AbstractStandardModule;
 use Metaseo\Metaseo\Utility\BackendUtility;
 use Metaseo\Metaseo\Utility\DatabaseUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Backend\Utility\BackendUtility as Typo3BackendUtility;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 
@@ -82,7 +83,7 @@ class BackendRootSettingsController extends AbstractStandardModule
                            VALUES (' . (int)$tmpUid . ',
                                    ' . (int)time() . ',
                                    ' . (int)time() . ',
-                                   ' . (int)$GLOBALS['BE_USER']->user['uid'] . ')';
+                                   ' . (int)GlobalUtility::getBackendUserAuthentication()->user['uid'] . ')';
             DatabaseUtility::execInsert($query);
         }
 

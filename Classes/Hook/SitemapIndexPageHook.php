@@ -28,6 +28,7 @@ namespace Metaseo\Metaseo\Hook;
 
 use Metaseo\Metaseo\Utility\FrontendUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use Metaseo\Metaseo\Utility\SitemapUtility;
 
 /**
@@ -114,7 +115,8 @@ class SitemapIndexPageHook extends SitemapIndexHook
      */
     protected function generateSitemapPageData($pageUrl)
     {
-        $page = $GLOBALS['TSFE']->page;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        $page = $tsfe->page;
 
         $tstamp = $_SERVER['REQUEST_TIME'];
 
@@ -122,10 +124,10 @@ class SitemapIndexPageHook extends SitemapIndexHook
             'tstamp'                => $tstamp,
             'crdate'                => $tstamp,
             'page_rootpid'          => GeneralUtility::getRootPid(),
-            'page_uid'              => $GLOBALS['TSFE']->id,
+            'page_uid'              => $tsfe->id,
             'page_language'         => GeneralUtility::getLanguageId(),
             'page_url'              => $pageUrl,
-            'page_depth'            => count($GLOBALS['TSFE']->rootLine),
+            'page_depth'            => count($tsfe->rootLine),
             'page_change_frequency' => $this->getPageChangeFrequency($page),
             'page_type'             => SitemapUtility::SITEMAP_TYPE_PAGE,
             'expire'                => $this->indexExpiration,
@@ -145,9 +147,10 @@ class SitemapIndexPageHook extends SitemapIndexHook
     protected function getPageUrl()
     {
         // Fetch chash
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         $pageHash = null;
-        if (!empty($GLOBALS['TSFE']->cHash)) {
-            $pageHash = $GLOBALS['TSFE']->cHash;
+        if (!empty($tsfe->cHash)) {
+            $pageHash = $tsfe->cHash;
         }
 
 
@@ -156,10 +159,10 @@ class SitemapIndexPageHook extends SitemapIndexHook
             $ret = FrontendUtility::getCurrentUrl();
         } else {
             $linkConf = array(
-                'parameter' => $GLOBALS['TSFE']->id,
+                'parameter' => $tsfe->id,
             );
 
-            $ret = $GLOBALS['TSFE']->cObj->typoLink_URL($linkConf);
+            $ret = $tsfe->cObj->typoLink_URL($linkConf);
             $ret = $this->processLinkUrl($ret);
         }
 

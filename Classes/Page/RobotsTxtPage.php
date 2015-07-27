@@ -27,6 +27,7 @@
 namespace Metaseo\Metaseo\Page;
 
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 
 /**
  * Robots txt Page
@@ -94,8 +95,9 @@ class RobotsTxtPage extends AbstractPage
         $settings = GeneralUtility::getRootSetting();
 
         // INIT
-        $this->tsSetup = $GLOBALS['TSFE']->tmpl->setup;
-        $this->cObj    = $GLOBALS['TSFE']->cObj;
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
+        $this->tsSetup = $tsfe->tmpl->setup;
+        $this->cObj    = $tsfe->cObj;
         $this->rootPid = GeneralUtility::getRootPid();
 
         $this->tsSetupSeo = null;

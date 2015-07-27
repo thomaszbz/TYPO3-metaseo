@@ -28,6 +28,7 @@ namespace Metaseo\Metaseo\Scheduler\Task;
 
 use Metaseo\Metaseo\Utility\DatabaseUtility;
 use Metaseo\Metaseo\Utility\FrontendUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -114,8 +115,8 @@ abstract class AbstractTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask
      */
     protected function setRootPageLanguage($languageId)
     {
-        $GLOBALS['TSFE']->tmpl->setup['config.']['sys_language_uid'] = $languageId;
-        $this->languageLock                                          = $languageId;
+        GlobalUtility::getTypoScriptFrontendController()->tmpl->setup['config.']['sys_language_uid'] = $languageId;
+        $this->languageLock = $languageId;
     }
 
     /**

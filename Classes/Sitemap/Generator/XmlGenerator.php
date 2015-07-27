@@ -27,6 +27,7 @@
 namespace Metaseo\Metaseo\Sitemap\Generator;
 
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 
 /**
  * Sitemap XML generator
@@ -45,6 +46,7 @@ class XmlGenerator extends AbstractGenerator
      */
     public function sitemapIndex()
     {
+        $tsfe = GlobalUtility::getTypoScriptFrontendController();
         $pageLimit = 10000;
 
         if (isset($this->tsSetup['pageLimit']) && $this->tsSetup['pageLimit'] != '') {
@@ -56,7 +58,7 @@ class XmlGenerator extends AbstractGenerator
         $pageCount = ceil($pageItems / $pageLimit);
 
         $linkConf = array(
-            'parameter'        => GeneralUtility::getCurrentPid() . ',' . $GLOBALS['TSFE']->type,
+            'parameter'        => GeneralUtility::getCurrentPid() . ',' . $tsfe->type,
             'additionalParams' => '',
             'useCacheHash'     => 1,
         );
@@ -69,7 +71,7 @@ class XmlGenerator extends AbstractGenerator
             } else {
                 $linkConf['additionalParams'] = '&page=' . ($i + 1);
 
-                $sitemaps[] = GeneralUtility::fullUrl($GLOBALS['TSFE']->cObj->typoLink_URL($linkConf));
+                $sitemaps[] = GeneralUtility::fullUrl($tsfe->cObj->typoLink_URL($linkConf));
             }
         }
 

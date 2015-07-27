@@ -28,6 +28,7 @@ namespace Metaseo\Metaseo\Hook;
 
 use Metaseo\Metaseo\Utility\FrontendUtility;
 use Metaseo\Metaseo\Utility\GeneralUtility;
+use Metaseo\Metaseo\Utility\GlobalUtility;
 
 /**
  * Http Header generator
@@ -41,7 +42,7 @@ class HttpHook
     public function main()
     {
         // INIT
-        $tsSetup = $GLOBALS['TSFE']->tmpl->setup;
+        $tsSetup = GlobalUtility::getTypoScriptFrontendController()->tmpl->setup;
         $headers = array();
 
         // don't send any headers if headers are already sent
@@ -52,7 +53,7 @@ class HttpHook
         // Init caches
         $cacheIdentification = sprintf(
             '%s_%s_http',
-            $GLOBALS['TSFE']->id,
+            GlobalUtility::getTypoScriptFrontendController()->id,
             substr(sha1(FrontendUtility::getCurrentUrl()), 10, 30)
         );
 
@@ -63,7 +64,7 @@ class HttpHook
         $cacheManager  = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
         $cache         = $cacheManager->getCache('cache_pagesection');
 
-        if (!empty($GLOBALS['TSFE']->tmpl->loaded)) {
+        if (!empty(GlobalUtility::getTypoScriptFrontendController()->tmpl->loaded)) {
             // ##################################
             // Non-Cached page
             // ##################################
@@ -101,7 +102,11 @@ class HttpHook
             }
 
             // Store headers into cache
-            $cache->set($cacheIdentification, $headers, array('pageId_' . $GLOBALS['TSFE']->id));
+            $cache->set(
+                $cacheIdentification,
+                $headers,
+                array('pageId_' . GlobalUtility::getTypoScriptFrontendController()->id)
+            );
         } else {
             // #####################################
             // Cached page
