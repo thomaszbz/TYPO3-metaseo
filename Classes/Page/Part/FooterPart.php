@@ -56,7 +56,7 @@ class FooterPart extends AbstractPart
         $tsSetup    = GlobalUtility::getTypoScriptFrontendController()->tmpl->setup;
         $tsServices = array();
 
-        $beLoggedIn = isset(GlobalUtility::getBackendUserAuthentication()->user['username']);
+        $beLoggedIn = GlobalUtility::isBackendUserLoggedIn();
 
         $disabledHeaderCode = false;
         if (!empty($tsSetup['config.']['disableAllHeaderCode'])) {

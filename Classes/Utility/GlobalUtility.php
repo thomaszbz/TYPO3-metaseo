@@ -54,6 +54,35 @@ class GlobalUtility
         return $GLOBALS[self::BE_USER];
     }
 
+//    /**
+//     * Returns true if BackendUserAuthentication is available
+//     *
+//     * @return bool
+//     */
+//    public static function isBackendUserAuthenticationAvailable()
+//    {
+//        if (!isset($GLOBALS[self::BE_USER])) {
+//            return false;
+//        }
+//
+//        if (!($GLOBALS[self::BE_USER] instanceof BackendUserAuthentication)) {
+//            return false;
+//        }
+//
+//        return true;
+//    }
+
+    /**
+     * Returns true if BackendUserAuthentication is available
+     *
+     * @return bool
+     */
+    public static function isBackendUserLoggedIn()
+    {
+        return isset($GLOBALS[self::BE_USER]->user['username']);
+    }
+
+
     /**
      * Get the TYPO3 CMS TypoScriptFrontendController
      *
