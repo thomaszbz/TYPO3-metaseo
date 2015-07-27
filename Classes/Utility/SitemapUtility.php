@@ -26,7 +26,7 @@
 
 namespace Metaseo\Metaseo\Utility;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility as Typo3GeneralUtility;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
@@ -224,7 +224,7 @@ class SitemapUtility
         ) {
             $pageTypeBlacklist = $tsfe->tmpl
                                       ->setup['plugin.']['metaseo.']['sitemap.']['index.']['pageTypeBlacklist'];
-            $pageTypeBlacklist = GeneralUtility::trimExplode(',', $pageTypeBlacklist);
+            $pageTypeBlacklist = Typo3GeneralUtility::trimExplode(',', $pageTypeBlacklist);
 
             $ret = array_merge($ret, $pageTypeBlacklist);
         }
