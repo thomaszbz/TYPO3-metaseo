@@ -149,7 +149,7 @@ class FrontendUtility
      *
      * @return bool
      */
-    public static function checkPageForBlacklist($blacklist)
+    public static function checkPageForBlacklist(array $blacklist)
     {
         return GeneralUtility::checkUrlForBlacklisting(self::getCurrentUrl(), $blacklist);
     }

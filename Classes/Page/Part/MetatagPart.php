@@ -350,7 +350,7 @@ class MetatagPart extends AbstractPart
      *
      * @return   string                      URL
      */
-    protected function generateLink($url, $conf = null, $disableMP = false)
+    protected function generateLink($url, array $conf = null, $disableMP = false)
     {
         $tsfe = GlobalUtility::getTypoScriptFrontendController();
         if ($conf === null) {
@@ -384,7 +384,7 @@ class MetatagPart extends AbstractPart
      *
      * @return   string            Page Id or url
      */
-    protected function detectCanonicalPage($tsConfig = array())
+    protected function detectCanonicalPage(array $tsConfig = array())
     {
         $tsfe = GlobalUtility::getTypoScriptFrontendController();
         #####################
@@ -511,7 +511,7 @@ class MetatagPart extends AbstractPart
      * @param array   $customMetaTagList Custom Meta Tag list
      * @todo $pageRecord not used. Possibly a bug?
      */
-    protected function advMetaTags(&$metaTags, $pageRecord, $sysLanguageId, $customMetaTagList)
+    protected function advMetaTags(array &$metaTags, array $pageRecord, $sysLanguageId, array $customMetaTagList)
     {
         //todo Should this be $pageRecord instead of $this->pageRecord?
         $pageRecordId = $this->pageRecord['uid'];
@@ -581,7 +581,7 @@ class MetatagPart extends AbstractPart
      *
      * @param array $tags
      */
-    protected function processMetaTags(&$tags)
+    protected function processMetaTags(array &$tags)
     {
         // Call hook
         GeneralUtility::callHookAndSignal(__CLASS__, 'metatagOutput', $this, $tags);

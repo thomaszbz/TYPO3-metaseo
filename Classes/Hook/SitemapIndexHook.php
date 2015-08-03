@@ -197,7 +197,7 @@ abstract class SitemapIndexHook implements SingletonInterface
      *
      * @return integer
      */
-    protected function getPageChangeFrequency($page)
+    protected function getPageChangeFrequency(array $page)
     {
         $ret = 0;
 
