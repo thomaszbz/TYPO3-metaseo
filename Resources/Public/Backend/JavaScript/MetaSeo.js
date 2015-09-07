@@ -69,5 +69,59 @@ MetaSeo = {
         search = search.toUpperCase();
         pos = value.toUpperCase().indexOf(search);
         return pos >= 0;
+    },
+
+    /**
+     * Severities for compatibility layer (compatible to old constants)
+     */
+    Severity: {
+        notice: -2,
+        info: -1,
+        success: 0,
+        warning: 1,
+        error: 2
+    },
+
+    /**
+     * Compatibility layer for Deprecation #62893 (7.0) and #66047 (7.2)
+     * To be removed when support for versions older than 7 LTS is discontinued.
+     *
+     * @copyright    Thomas Mayer (2bis10 IT-Services UG (haftungsbeschraenkt)) <thomas.mayer@2bis10.de>
+     */
+    flashMessage: function(severity, title, message) {
+        var duration = 3;
+        var sev;
+        if ((typeof top) === 'object') {
+            if ('TYPO3' in top) {
+                if ('Notification' in top.TYPO3) {
+                    //TYPO3 CMS 7.2+ detected
+                    switch (severity) {
+                        case this.Severity.notice:
+                            top.TYPO3.Notification.notice(title, message, duration);
+                            break;
+                        case this.Severity.success:
+                            top.TYPO3.Notification.success(title, message, duration);
+                            break;
+                        case this.Severity.warning:
+                            top.TYPO3.Notification.warning(title, message, duration);
+                            break;
+                        case this.Severity.error:
+                            top.TYPO3.Notification.error(title, message, duration);
+                            break;
+                        case this.Severity.info:
+                        default:
+                            top.TYPO3.Notification.info(title, message, duration);
+                    }
+                    return;
+                }
+                if ('Flashmessage' in top.TYPO3) {
+                    //TYPO3 CMS 7.0+ detected
+                    top.TYPO3.Flashmessage.display(severity, title, message, duration);
+                    return;
+                }
+            }
+        }
+        // Fallback for TYPO3 CMS 6.2
+        TYPO3.Flashmessage.display(severity, title, message, duration);
     }
 };
