@@ -368,7 +368,7 @@ class MetatagPart extends AbstractPart
 
         $ret = $this->cObj->typoLink_URL($conf);
         // maybe baseUrlWrap is better? but breaks with realurl currently?
-        $ret = GeneralUtility::fullUrl($ret);
+        $ret = GeneralUtility::fullUrl($ret, true);
 
         if ($disableMP === true) {
             // Restore old MP linking configuration

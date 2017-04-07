@@ -65,7 +65,7 @@ class TxtGenerator extends AbstractGenerator
                 continue;
             }
 
-            $ret[] = GeneralUtility::fullUrl($sitemapPage['page_url']);
+            $ret[] = GeneralUtility::fullUrl($sitemapPage['page_url'], true);
         }
 
         // Call hook

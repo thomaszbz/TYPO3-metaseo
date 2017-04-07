@@ -63,13 +63,16 @@ class XmlGenerator extends AbstractGenerator
 
         for ($i = 0; $i < $pageCount; $i++) {
             if ($this->indexPathTemplate) {
-                $link = GeneralUtility::fullUrl(str_replace('###PAGE###', $i, $this->indexPathTemplate));
+                $link = GeneralUtility::fullUrl(
+                    str_replace('###PAGE###', $i, $this->indexPathTemplate),
+                    true
+                );
 
                 $sitemaps[] = $link;
             } else {
                 $linkConf['additionalParams'] = '&page=' . ($i + 1);
 
-                $sitemaps[] = GeneralUtility::fullUrl($GLOBALS['TSFE']->cObj->typoLink_URL($linkConf));
+                $sitemaps[] = GeneralUtility::fullUrl($GLOBALS['TSFE']->cObj->typoLink_URL($linkConf), false);
             }
         }
 
@@ -207,7 +210,7 @@ class XmlGenerator extends AbstractGenerator
             // #####################################
 
             // page Url
-            $pageUrl = GeneralUtility::fullUrl($sitemapPage['page_url']);
+            $pageUrl = GeneralUtility::fullUrl($sitemapPage['page_url'], true);
 
             // Page modification date
             $pageModificationDate = date('c', $sitemapPage['tstamp']);

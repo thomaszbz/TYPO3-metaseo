@@ -400,11 +400,12 @@ class GeneralUtility
      * Makes sure the url is absolute (http://....)
      *
      * @param   string $url    URL
+     * @param   boolean $needsPrefix set to true if $url given is relative to TYPO3_SITE_URL
      * @param   string $domain Domain
      *
      * @return  string
      */
-    public static function fullUrl($url, $domain = null)
+    public static function fullUrl($url, $needsPrefix, $domain = null)
     {
         if (!preg_match('/^https?:\/\//i', $url)) {
             // Fix for root page link
@@ -419,10 +420,19 @@ class GeneralUtility
 
             if ($domain !== null) {
                 // specified domain
-                $url = 'http://' . $domain . '/' . $url;
+                if ($needsPrefix === true) {
+                    $url = 'http://' . $domain . $GLOBALS['TSFE']->absRefPrefix . '/' . $url;
+                } else {
+                    $url = 'http://' . $domain . '/' . $url;
+                }
             } else {
                 // domain from env
-                $url = Typo3GeneralUtility::getIndpEnv('TYPO3_SITE_URL') . $url;
+                $siteUrl = Typo3GeneralUtility::getIndpEnv('TYPO3_SITE_URL');
+                if ($needsPrefix === true) {
+                    $url = $siteUrl . $url;
+                } else {
+                    $url = self::removePathFromUrl($siteUrl) . '/' . $url;
+                }
             }
         }
 
@@ -430,6 +440,17 @@ class GeneralUtility
         $url = str_replace('?&', '?', $url);
 
         return $url;
+    }
+
+    /**
+     * @param string $url which ends with a path
+     *
+     * @return string
+     */
+    private static function removePathFromUrl($url)
+    {
+        $path = parse_url($url, PHP_URL_PATH);
+        return substr($url, 0, -strlen($path));
     }
 
     // ########################################################################

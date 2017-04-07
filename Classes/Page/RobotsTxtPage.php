@@ -208,7 +208,7 @@ class RobotsTxtPage extends AbstractPage
         }
 
         // Fix sitemap-marker url (add prefix if needed)
-        $markerList['%sitemap%'] = GeneralUtility::fullUrl($markerList['%sitemap%']);
+        $markerList['%sitemap%'] = GeneralUtility::fullUrl($markerList['%sitemap%'], true);
 
         // Call hook
         GeneralUtility::callHookAndSignal(__CLASS__, 'robotsTxtMarker', $this, $markerList);

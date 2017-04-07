@@ -102,7 +102,7 @@ class UrlController extends AbstractPageSeoSimController
         $ret = $feUtility->getTypoLinkUrl($typoLink);
 
         if (!empty($ret)) {
-            $ret = GeneralUtility::fullUrl($ret);
+            $ret = GeneralUtility::fullUrl($ret, true);
         }
 
         if (empty($ret)) {

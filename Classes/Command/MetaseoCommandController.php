@@ -91,7 +91,7 @@ class MetaseoCommandController extends CommandController
 
             foreach ($urlList as $url) {
                 if ($domain) {
-                    $url = GeneralUtility::fullUrl($url, $domain);
+                    $url = GeneralUtility::fullUrl($url, true, $domain);
                 }
 
                 ConsoleUtility::writeLine($url);
